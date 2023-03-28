@@ -5,21 +5,21 @@
         "color": {
             "lightTheme": {
                 "palette": {
-                    "primary": "#F04405",
+                    "primary": "#31A457",
                     "secondary": "#0D0D0D"
                 },
                 "toolbar": {
-                    "background": "linear-gradient(to right, #F04405, #F04405)"
+                    "background": "linear-gradient(to right, #31A457, #31A457)"
                 },
                 "menuItens": "#ffffff",
                 "sub": "#ffffff",
-                "toolbarIcon": "#ffffff",
+                "toolbarIcon": "#31A457",
                 "divide": "#E0E0E0"
             },
             "darkTheme": {
                 "palette": {
-                    "primary": "#F04405",
-                    "secondary": "#ff9100",
+                    "primary": "#31A457",
+                    "secondary": "#F2F0E4",
                     "background": {
                         "default": "#080d14",
                         "paper": "#181d22"
@@ -30,11 +30,11 @@
                     }
                 },
                 "toolbar": {
-                    "background": "linear-gradient(to right, #F04405, #F04405)"
+                    "background": "linear-gradient(to right, #31A457, #31A457)"
                 },
                 "menuItens": "#181d22",
                 "sub": "#181d22",
-                "toolbarIcon": "#F04405",
+                "toolbarIcon": "#181d22",
                 "divide": "#080d14"
             }
         }
