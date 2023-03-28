@@ -1,4 +1,4 @@
-# Manual de Instação do Press Ticket em Localhost
+# Manual de Instação do Valezap em Localhost
 
 OBS: Ter instalado o Banco de Dados, podendo usar o Xamp, o Wamp ou qualquer um de sua preferência.
 
@@ -7,19 +7,19 @@ OBS: Ter instalado o Banco de Dados, podendo usar o Xamp, o Wamp ou qualquer um 
 1. Criar Banco de dados
 
 ```bash
-CREATE DATABASE pressticket CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE valezap CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ```
 
 2. Clonar o repositório
 
 ```bash
-git clone https://github.com/rtenorioh/Press-Ticket.git Press-Ticket
+git clone https://github.com/JobasFernandes/Press-Ticket.git valezap
 ```
 
-3. Entrar no diretório backend do Press-Ticket
+3. Entrar no diretório backend do Valezap
 
 ```bash
-cd Press-Ticket/backend
+cd valezap/backend
 ```
 
 4. Criar o arquivo .env e inserir as informações do item 5
@@ -35,11 +35,12 @@ PROXY_PORT=8080
 CHROME_BIN=C:\Program Files\Google\Chrome\Application\chrome.exe  
 
 DB_DIALECT=mysql  
-DB_HOST=localhost  
+DB_HOST=localhost
+DB_PORT=3306
 DB_TIMEZONE=-03:00  
 DB_USER=root  
 DB_PASS=  
-DB_NAME=pressticket 
+DB_NAME=valezap 
 
 USER_LIMIT=3  
 CONNECTIONS_LIMIT=1
@@ -78,10 +79,10 @@ npx sequelize db:seed:all
 npm start
 ```
 
-11. Entrar no diretório frontend do Press-Ticket
+11. Entrar no diretório frontend do Valezap
 
 ```bash
-cd Press-Ticket/frontend
+cd valezap/frontend
 ``` 
 
 12. Criar o arquivo .env e inserir as informações do item 13
@@ -91,7 +92,7 @@ cd Press-Ticket/frontend
 ```bash
 REACT_APP_BACKEND_URL=http://localhost:8080
 REACT_APP_HOURS_CLOSE_TICKETS_AUTO=
-REACT_APP_PAGE_TITLE=PressTicket
+REACT_APP_PAGE_TITLE=Valezap
 PORT=3333
 <<<<<<< HEAD
 ``` 
@@ -122,7 +123,7 @@ set NODE_OPTIONS=--openssl-legancy-provider
 
 * User: 
 ```bash
-admin@mkthub.tech
+contato@valezap.app
 ```
 * Password: 
 ```bash

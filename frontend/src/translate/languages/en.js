@@ -222,7 +222,7 @@ const messages = {
       tags: {
         title: "Tags",
         table: {
-          id:"ID",
+          id: "ID",
           name: "Tags",
           color: "Color",
           contacts: "Contacts",
@@ -413,7 +413,7 @@ const messages = {
         appBar: {
           message: {
             hi: "Hello",
-            text: "welcome to the System"
+            text: "welcome"
           },
           user: {
             profile: "Profile",
@@ -442,7 +442,7 @@ const messages = {
             userId: "User ID",
             whatsappId: "WhatsApp ID",
             body: "Here goes your text",
-            medias : "Here goes your media",
+            medias: "Here goes your media",
             fullNumber: "14089999999"
           },
           exempleText: "Below is a list of information needed to send text messages:",
@@ -637,6 +637,7 @@ const messages = {
             resolve: "Solve",
             reopen: "Reopen",
             accept: "Accept",
+            finish: "Finish",
           },
         },
       },

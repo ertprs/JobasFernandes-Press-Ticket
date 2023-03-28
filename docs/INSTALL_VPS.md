@@ -1,4 +1,4 @@
-# Manual de Instação do Press Ticket na VPS 
+# Manual de Instação do Valezap na VPS 
 
 ### Observação:
 - Antes de começar a instalação é necessário ter criado antecipadamente os subdomínios e já estarem apontados para o IP da VPS.
@@ -44,7 +44,7 @@ sudo mysql -u root
 7. Criando o BD
 
 ```bash
-CREATE DATABASE pressticket CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+CREATE DATABASE valezap CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
 ```
 
 8. Acessar o BD do mysql
@@ -147,16 +147,16 @@ su - ${USER}
 cd ~
 ```
 
-25. baixar o repositório do Press Ticket
+25. baixar o repositório do Valezap
 
 ```bash
-git clone https://github.com/rtenorioh/Press-Ticket.git Press-Ticket
+git clone https://github.com/JobasFernandes/Press-Ticket.git valezap
 ```
 
 26. Copiar o env de exemplo para o backend
 
 ```bash
-cp Press-Ticket/backend/.env.example Press-Ticket/backend/.env
+cp valezap/backend/.env.example valezap/backend/.env
 ```
 
 27. Rodar o comando abaixo 2x para gerar JWT_SECRET e JWT_REFRESH_SECRET
@@ -169,17 +169,18 @@ openssl rand -base64 32
 
 ```bash
 NODE_ENV=  
-BACKEND_URL=https://back.pressticket.com.br  
-FRONTEND_URL=https://ticket.pressticket.com.br  
+BACKEND_URL=https://back.valezap.app
+FRONTEND_URL=https://front.valezap.app
 PORT=8080  
 PROXY_PORT=443  
 CHROME_BIN=/usr/bin/google-chrome-stable  
 DB_DIALECT=mysql  
-DB_HOST=localhost  
+DB_HOST=localhost
+DB_PORT=3306
 DB_TIMEZONE=-03:00   
 DB_USER=root  
 DB_PASS=  
-DB_NAME=pressticket  
+DB_NAME=valezap  
 USER_LIMIT=3  
 CONNECTIONS_LIMIT=1
 JWT_SECRET=
@@ -189,7 +190,7 @@ JWT_REFRESH_SECRET=
 29. Abrir para edição o arquivo .env com o comando abaixo e prencher com os dados acima.
 
 ```bash
-nano Press-Ticket/backend/.env
+nano valezap/backend/.env
 ```
 
 30. Instação de libs
@@ -213,7 +214,7 @@ sudo apt install ./google-chrome-stable_current_amd64.deb
 33. Acessando o backend
 
 ```bash
-cd Press-Ticket/backend
+cd valezap/backend
 ```
 
 34. Instalando as dependências
@@ -249,7 +250,7 @@ sudo npm install -g pm2
 39. Iniciando o backend com PM2
 
 ```bash
-pm2 start dist/server.js --name Press-Ticket-backend
+pm2 start dist/server.js --name valezap-backend
 ```
 
 40. 
@@ -282,9 +283,9 @@ nano .env
 
 45. 
 ```bash
-REACT_APP_BACKEND_URL=https://back.pressticket.com.br 
+REACT_APP_BACKEND_URL=https://back.valezap.app
 REACT_APP_HOURS_CLOSE_TICKETS_AUTO=
-REACT_APP_PAGE_TITLE=PressTicket
+REACT_APP_PAGE_TITLE=Valezap
 PORT=3333
 ```
 
@@ -303,7 +304,7 @@ npm run build
 48. Iniciando o frontend com PM2
 
 ```bash
-pm2 start server.js --name Press-Ticket-frontend
+pm2 start server.js --name valezap-frontend
 ```
 
 49. Salvando os serviços iniciados pelo PM2
@@ -328,7 +329,7 @@ sudo apt install nginx
 
 ```bash
 server {  
-  server_name front.pressticket.com.br;  
+  server_name front.valezap.app;  
   location / {  
     proxy_pass http://127.0.0.1:3333;  
     proxy_http_version 1.1;  
@@ -343,23 +344,23 @@ server {
 }  
 ```
 
-53. Criar e editar o arquivo Press-Ticket-frontend com o comando abaixo e prencher com os dados do item 52.
+53. Criar e editar o arquivo valezap-frontend com o comando abaixo e prencher com os dados do item 52.
 
 ```bash
-sudo nano /etc/nginx/sites-available/Press-Ticket-frontend
+sudo nano /etc/nginx/sites-available/valezap-frontend
 ```
 
-54. Criar uma cópia do arquivo Press-Ticket-frontend com o comando abaixo para criar o arquivo para o backend.
+54. Criar uma cópia do arquivo valezap-frontend com o comando abaixo para criar o arquivo para o backend.
 
 ```bash
-sudo cp /etc/nginx/sites-available/Press-Ticket-frontend /etc/nginx/sites-available/Press-Ticket-backend
+sudo cp /etc/nginx/sites-available/valezap-frontend /etc/nginx/sites-available/valezap-backend
 ```
 
 55. Editar os dados abaixo com a URL que será usada para acessar o backend.
 
 ```bash
 server {  
-  server_name back.pressticket.com.br;  
+  server_name back.valezap.app;  
   location / {  
     proxy_pass http://127.0.0.1:8080;  
     proxy_http_version 1.1;  
@@ -374,10 +375,10 @@ server {
 }
 ```
 
-56. editar o arquivo Press-Ticket-backend com o comando abaixo e prencher com os dados do item 55.
+56. editar o arquivo valezap-backend com o comando abaixo e prencher com os dados do item 55.
 
 ```bash
-sudo nano /etc/nginx/sites-available/Press-Ticket-backend
+sudo nano /etc/nginx/sites-available/valezap-backend
 ```
   
 57. Acessar a pasta onde os arquivos foram criados
@@ -398,16 +399,16 @@ sudo rm -rf default
 ls
 ```
 
-60. Criar link simbólico para o arquivo Press-Ticket-frontend
+60. Criar link simbólico para o arquivo valezap-frontend
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/Press-Ticket-frontend /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/valezap-frontend /etc/nginx/sites-enabled
 ```
 
-61. Criar link simbólico para o arquivo Press-Ticket-backend
+61. Criar link simbólico para o arquivo valezap-backend
 
 ```bash
-sudo ln -s /etc/nginx/sites-available/Press-Ticket-backend /etc/nginx/sites-enabled
+sudo ln -s /etc/nginx/sites-available/valezap-backend /etc/nginx/sites-enabled
 ```
 
 62. Testar as configurações do nginx
@@ -478,7 +479,7 @@ cd ~
 73. Acessando a pasta do sistema
 
 ```bash
-cd Press-Ticket/
+cd valezap/
 ```
 
 73. Dentro da pasta do sistema rode o comando abaixo para executar a atualização
@@ -493,7 +494,7 @@ sh UPDATE.sh
 
 * User: 
 ```bash
-admin@pressticket.com.br  
+contato@valezap.app
 ```
 * Password: 
 ```bash

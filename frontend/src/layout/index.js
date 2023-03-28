@@ -241,14 +241,13 @@ const LoggedInLayout = ({ children }) => {
             <MenuIcon />
           </IconButton>
           <Typography
-            component="h1"
-            variant="h6"
+            component="span"
             color="inherit"
             noWrap
             className={classes.title}
           >
 
-            {i18n.t("mainDrawer.appBar.message.hi")} {user.name}, {i18n.t("mainDrawer.appBar.message.text")} {system.name || "Mktsend"}
+            👋 {i18n.t("mainDrawer.appBar.message.hi")} <b>{user.name}</b>, {i18n.t("mainDrawer.appBar.message.text")}
           </Typography>
           {user.id && <NotificationsPopOver />}
 
@@ -285,7 +284,7 @@ const LoggedInLayout = ({ children }) => {
               </MenuItem>
               <Divider />
               <span className={classes.systemCss}>
-                <Link color="inherit" href={"https://mkthub.tech"}>
+                <Link color="inherit" href={"https://valezap.app"}>
                   v{systemVersion}
                 </Link>
               </span>

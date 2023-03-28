@@ -413,7 +413,7 @@ const messages = {
         appBar: {
           message: {
             hi: "Hola",
-            text: "bienvenido al Sistema"
+            text: "bienvenido"
           },
           user: {
             profile: "Perfil",
