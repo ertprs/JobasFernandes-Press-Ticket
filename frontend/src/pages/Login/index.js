@@ -1,26 +1,20 @@
 import React, { useState, useContext } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import SocialMediaList from '../../components/SocialMediaList';
 
 import {
   Button,
   CssBaseline,
   TextField,
-  Grid,
-  Box,
   Typography,
   Container,
-  InputAdornment,
-  IconButton,
   Link
 } from '@material-ui/core';
 
-import { Visibility, VisibilityOff } from '@material-ui/icons';
 import { makeStyles } from "@material-ui/core/styles";
 import { i18n } from "../../translate/i18n";
 
 import { AuthContext } from "../../context/Auth/AuthContext";
 import { system } from "../../config.json";
-import { systemVersion } from "../../../package.json";
 import logo from '../../assets/logo.png';
 
 
@@ -28,7 +22,7 @@ const useStyles = makeStyles(theme => ({
   root: {
     width: "100vw",
     height: "100vh",
-    backgroundImage: "url(https://mkthub.tech/wp-content/uploads/2022/02/old-black-background-grunge-texture-dark-wallpaper-blackboard-chalkboard-room-wall-1-scaled-1.jpg)",
+    backgroundImage: "url(https://nuvem.automatusinf.com.br/apps/files_sharing/publicpreview/fncQPoGiyZnZPB8?file=/&fileId=1496&x=1920&y=1080&a=true)",
     backgroundRepeat: "no-repeat",
     backgroundSize: "100% 100%",
     backgroundPosition: "center",
@@ -141,20 +135,18 @@ const Login = () => {
 						</Grid>
 					</Grid> */}
           </form>
-
-          <Typography variant="body2" color="textSecondary" align="center">
-            <Link color="inherit" href={system.url}>
-              {system.name} - CNPJ: 34.211.165/0001-24
-              <br></br>
-              Todos os direitos reservados - <b>v{systemVersion}</b>
-              <br></br>
-              © 2022 - {new Date().getFullYear()}
-            </Link>
-            {"."}
-          </Typography>
+          <br></br>
+          <div style={{ textAlign: 'center', margin: 0 }}>
+            <SocialMediaList style={{ marginBottom: 0 }} />
+          </div>
         </div>
         <br />
       </Container>
+      <Link color="inherit" href={system.url}>
+        {system.name} - CNPJ: 41.646.725/0001-39
+      </Link>
+      © 2022 - {new Date().getFullYear()}
+      {"."}
     </div>
   );
 };
