@@ -694,7 +694,7 @@ const messages = {
         ERR_INVALID_CREDENTIALS: "Authentication error. Please try again.",
         ERR_SENDING_WAPP_MSG: "Error sending WhatsApp message. Check connections page.",
         ERR_DELETE_WAPP_MSG: "Unable to delete WhatsApp message.",
-        ERR_OTHER_OPEN_TICKET: "There is already an open ticket for this contact.",
+        ERR_OTHER_OPEN_TICKET: "There is already an open call for this contact with ",
         ERR_SESSION_EXPIRED: "Session expired. Please sign in.",
         ERR_USER_CREATION_DISABLED: "Creation of the attendant has been disabled by the administrator.",
         ERR_NO_PERMISSION: "You do not have permission to access this resource.",

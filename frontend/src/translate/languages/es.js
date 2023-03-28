@@ -693,7 +693,7 @@ const messages = {
         ERR_INVALID_CREDENTIALS: "Error de autenticación. Vuelva a intentarlo",
         ERR_SENDING_WAPP_MSG: "Error al enviar el mensaje de WhatsApp. Verificar página de conexiones.",
         ERR_DELETE_WAPP_MSG: "No se pudo eliminar el mensaje de WhatsApp.",
-        ERR_OTHER_OPEN_TICKET: "Ya hay un ticket abierto para este contacto.",
+        ERR_OTHER_OPEN_TICKET: "Ya hay una convocatoria abierta para este contacto con ",
         ERR_SESSION_EXPIRED: "Sesión caducada. Inicie sesión.",
         ERR_USER_CREATION_DISABLED: "La creación de asistentes ha sido deshabilitada por el administrador.",
         ERR_NO_PERMISSION: "No tienes permiso para acceder a este recurso.",
