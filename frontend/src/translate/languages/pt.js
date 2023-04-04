@@ -362,14 +362,15 @@ const messages = {
         assignedHeader: "Atendendo",
         noTicketsTitle: "Nada aqui!",
         noTicketsMessage: "Nenhum chamado encontrado com esse status ou termo pesquisado",
-        connectionTitle: "Conexão que está sendo utilizada atualmente.",
+        connectionTitle: "Conexão usada!",
         items: {
           queueless: "Sem Setor",
           accept: "Aceitar",
           spy: "Espiar",
           close: "Encerrar",
           reopen: "Reabrir",
-          return: "Mover para aguardando"
+          return: "Mover para aguardando",
+          queueSelected: "Setor"
         },
         buttons: {
           accept: "Responder",
