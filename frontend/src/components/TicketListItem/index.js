@@ -145,7 +145,7 @@ const TicketListItem = ({ ticket }) => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchTicket = async () => {
 				try {
-					const { data } = await api.get("/tickets/" + ticketId);
+					const { data } = await api.get("/tickets/" + ticket.id);
 
 					setTag(data?.contact?.tags);
 
