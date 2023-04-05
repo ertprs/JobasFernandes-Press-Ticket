@@ -30,7 +30,6 @@ import { Can } from "../Can";
 const useStyles = makeStyles(theme => ({
 	ticket: {
 		position: "relative",
-		display: "flex",
 	},
 
 	pendingTicket: {
@@ -67,28 +66,33 @@ const useStyles = makeStyles(theme => ({
 
 	lastMessageTime: {
 		justifySelf: "flex-end",
-		marginRight: -60,
 	},
 
-	closedBadge: {
+/* 	closedBadge: {
 		alignSelf: "center",
 		justifySelf: "flex-end",
-		marginRight: 32,
+		marginRight: 50,
 		marginLeft: "auto",
-	},
+	}, */
 
 	contactLastMessage: {
 		flexWrap: "wrap",
 	},
 
 	newMessagesCount: {
+		position: "absolute",
 		alignSelf: "center",
 		marginRight: 8,
 		marginLeft: "auto",
+		top: "20px",
+		right: "14px",
+		borderRadius: 0,
 	},
 
 	bottomButton: {
 		position: "relative",
+		height: "10px",
+		width: "10px",
 	},
 
 	badgeStyle: {
@@ -128,7 +132,15 @@ const useStyles = makeStyles(theme => ({
 			transform: "scale(1) translate(0%, -40%)",
 		},
 
-	}
+	},
+	ticketQueueColor: {
+		flex: "none",
+		width: "8px",
+		height: "100%",
+		position: "absolute",
+		top: "0%",
+		left: "0%",
+	},
 }));
 
 const TicketListItem = ({ ticket }) => {
@@ -140,6 +152,7 @@ const TicketListItem = ({ ticket }) => {
 	const { user } = useContext(AuthContext);
 	const [acceptTicketWithouSelectQueueOpen, setAcceptTicketWithouSelectQueueOpen] = useState(false);
 	const [tag, setTag] = useState([]);
+	const [ticketQueueColor, setTicketQueueColor] = useState(null);
 
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
@@ -162,6 +175,7 @@ const TicketListItem = ({ ticket }) => {
 	}, [ticketId, user, history]);
 
 	useEffect(() => {
+		setTicketQueueColor(ticket.queue?.color);
 		return () => {
 			isMounted.current = false;
 		};
@@ -303,15 +317,19 @@ const TicketListItem = ({ ticket }) => {
 					[classes.pendingTicket]: (ticket.status === "pending"),
 				})}
 			>
+				<Tooltip arrow placement="right" title={ticket.queue?.name?.toUpperCase() || "SEM FILA"} >
+					<span style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }} className={classes.ticketQueueColor}></span>
+				</Tooltip>
 				<ListItemAvatar>
 					<Avatar style={{
-						height: 75,
-						width: 75,
+						height: 50,
+						width: 50,
 						borderRadius: 4,
 						marginLeft: -5,
 						marginRight: 5
 					}}
-						src={ticket?.contact?.profilePicUrl} />
+						src={ticket?.contact?.profilePicUrl}
+					/>
 				</ListItemAvatar>
 				<ListItemText
 					disableTypography
@@ -325,6 +343,13 @@ const TicketListItem = ({ ticket }) => {
 							>
 								{ticket.contact.name}
 							</Typography>
+							{/* {ticket.status === "closed" && (
+								<Badge
+									className={classes.closedBadge}
+									badgeContent={"Fechado"}
+									color="primary"
+								/>
+							)} */}
 							{ticket.lastMessage && (
 								<Typography
 									className={classes.lastMessageTime}
@@ -362,7 +387,8 @@ const TicketListItem = ({ ticket }) => {
 								badgeContent={ticket.unreadMessages}
 								classes={{
 									badge: classes.badgeStyle,
-								}} />
+								}}
+							/>
 						</span>
 							<span className={classes.Radiusdot}>
 								<Tooltip title={i18n.t("ticketsList.connectionTitle")}>
@@ -406,7 +432,7 @@ const TicketListItem = ({ ticket }) => {
 								/>
 							</span>
 							<span className={classes.Radiusdot}>
-								<Tooltip title={i18n.t("ticketsList.items.queueSelected")}>
+								{/* <Tooltip title={i18n.t("ticketsList.items.queueSelected")}>
 									<Badge
 										style={{
 											backgroundColor: ticket.queue?.color || "#7C7C7C",
@@ -420,7 +446,7 @@ const TicketListItem = ({ ticket }) => {
 											color: "white"
 										}}
 										badgeContent={ticket.queue?.name || "SEM SETOR"} />
-								</Tooltip>
+								</Tooltip> */}
 								<Tooltip title={"Tags"}>
 									<span className={classes.Radiusdot}>
 										{
@@ -439,6 +465,7 @@ const TicketListItem = ({ ticket }) => {
 				{(ticket.status === "pending" && (ticket.queue === null || ticket.queue === undefined)) && (
 					<Tooltip title={i18n.t("ticketsList.items.accept")}>
 						<IconButton
+							style={{ background: 'green', color: 'white', bottom: '-20px', borderRadius: '15px', border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
 							className={classes.bottomButton}
 							color="primary"
 							onClick={e => handleOpenAcceptTicketWithouSelectQueue()}
@@ -450,6 +477,7 @@ const TicketListItem = ({ ticket }) => {
 				{ticket.status === "pending" && ticket.queue !== null && (
 					<Tooltip title={i18n.t("ticketsList.items.accept")}>
 						<IconButton
+							style={{ background: 'green', color: 'white', bottom: '-20px', borderRadius: '15px', border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
 							className={classes.bottomButton}
 							color="primary"
 							onClick={e => handleAcepptTicket(ticket.id)} >
@@ -480,6 +508,7 @@ const TicketListItem = ({ ticket }) => {
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.return")}>
 						<IconButton
+							style={{ background: '#FFD700', color: 'white', marginRight: "5px", bottom: '-20px', borderRadius: '15px', border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
 							className={classes.bottomButton}
 							color="primary"
 							onClick={e => handleViewTicket(ticket.id)} >
@@ -490,6 +519,7 @@ const TicketListItem = ({ ticket }) => {
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.close")}>
 						<IconButton
+							style={{ background: '#cf0e00', color: 'white', bottom: '-20px', borderRadius: "15px", border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
 							className={classes.bottomButton}
 							color="primary"
 							onClick={e => handleClosedTicket(ticket.id)} >
@@ -498,12 +528,15 @@ const TicketListItem = ({ ticket }) => {
 					</Tooltip>
 				)}
 				{ticket.status === "closed" && (
-					<IconButton
-						className={classes.bottomButton}
-						color="primary"
-						onClick={e => handleReopenTicket(ticket.id)} >
-						<ReplayIcon />
-					</IconButton>
+					<Tooltip title={i18n.t("ticketsList.items.reopen")}>
+						<IconButton
+							style={{ background: 'green', color: 'white', bottom: '-20px', borderRadius: "15px", border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
+							className={classes.bottomButton}
+							color="primary"
+							onClick={e => handleReopenTicket(ticket.id)} >
+							<ReplayIcon />
+						</IconButton>
+					</Tooltip>
 				)}
 			</ListItem>
 			<Divider variant="middle" component="li" />

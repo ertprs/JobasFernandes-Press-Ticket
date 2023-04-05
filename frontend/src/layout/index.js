@@ -12,7 +12,9 @@ import {
   Menu,
   MenuItem,
   Toolbar,
-  Typography
+  Typography,
+  useTheme,
+  useMediaQuery,
 } from "@material-ui/core";
 
 import MenuIcon from "@material-ui/icons/Menu";
@@ -28,7 +30,6 @@ import { i18n } from "../translate/i18n";
 
 import api from "../services/api";
 import toastError from "../errors/toastError";
-/* import { system } from "../config.json"; */
 import { systemVersion } from "../../package.json";
 import logodash from "../assets/logo-dash.png";
 
@@ -50,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
   toolbarIcon: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     padding: "0 8px",
     minHeight: "48px",
     backgroundColor: theme.palette.toolbarIcon.main
@@ -78,6 +79,7 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     flexGrow: 1,
+    fontSize: 14,
   },
   drawerPaper: {
     position: "relative",
@@ -105,6 +107,7 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flex: 1,
     overflow: "auto",
+    ...theme.scrollbarStyles,
   },
   container: {
     paddingTop: theme.spacing(4),
@@ -121,7 +124,13 @@ const useStyles = makeStyles((theme) => ({
     justifyContent: "center",
     opacity: 0.2,
     fontSize: 12
-  }
+  },
+  containerWithScroll: {
+    flex: 1,
+    padding: theme.spacing(1),
+    overflowY: "scroll",
+    ...theme.scrollbarStyles,
+  },
 }));
 
 const LoggedInLayout = ({ children }) => {
@@ -133,6 +142,8 @@ const LoggedInLayout = ({ children }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerVariant, setDrawerVariant] = useState("permanent");
   const { user } = useContext(AuthContext);
+  const theme = useTheme();
+  const saudacaoUserSm = useMediaQuery(theme.breakpoints.up("sm"));
 
   useEffect(() => {
 
@@ -246,8 +257,13 @@ const LoggedInLayout = ({ children }) => {
             noWrap
             className={classes.title}
           >
-
-            👋 {i18n.t("mainDrawer.appBar.message.hi")} <b>{user.name}</b>, {i18n.t("mainDrawer.appBar.message.text")}
+            {saudacaoUserSm ? (
+              <>
+                👋 {i18n.t("mainDrawer.appBar.message.hi")} <b>{user.name}</b>, {i18n.t("mainDrawer.appBar.message.text")}
+              </>
+            ) : (
+              user.name
+            )}
           </Typography>
           {user.id && <NotificationsPopOver />}
 
