@@ -235,23 +235,23 @@ const TicketsList = (props) => {
 		const allticket = settings && settings.length > 0 && getSettingValue("allTicket") === "enabled";
 
 
-		
+
 
 		// Função para identificação liberação da settings 
 		if (allticket === true) {
 			//Verificação de perfil liberado para ver chamados liberando todos a verem
 			if (profile === "") {
 				dispatch({ type: "LOAD_TICKETS", payload: filteredTickets });
-				
-			}else{
+
+			} else {
 				dispatch({ type: "LOAD_TICKETS", payload: tickets });
 			}
 		} else {
 			//Verificação de perfil liberado para ver chamados, bloqueando user de verem
 			if (profile === "user") {
 				dispatch({ type: "LOAD_TICKETS", payload: filteredTickets });
-				
-			}else{
+
+			} else {
 				dispatch({ type: "LOAD_TICKETS", payload: tickets });
 			}
 		}

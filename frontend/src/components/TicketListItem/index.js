@@ -145,7 +145,7 @@ const TicketListItem = ({ ticket }) => {
 		const delayDebounceFn = setTimeout(() => {
 			const fetchTicket = async () => {
 				try {
-					const { data } = await api.get("/tickets/" + ticket.id);
+					const { data } = await api.get("/tickets/" + ticketId);
 
 					setTag(data?.contact?.tags);
 
@@ -404,7 +404,7 @@ const TicketListItem = ({ ticket }) => {
 										</>
 									)}
 								/>
-							</span><br></br>
+							</span>
 							<span className={classes.Radiusdot}>
 								<Tooltip title={i18n.t("ticketsList.items.queueSelected")}>
 									<Badge

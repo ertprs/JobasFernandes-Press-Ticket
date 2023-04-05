@@ -28,7 +28,7 @@ import { i18n } from "../translate/i18n";
 
 import api from "../services/api";
 import toastError from "../errors/toastError";
-import { system } from "../config.json";
+/* import { system } from "../config.json"; */
 import { systemVersion } from "../../package.json";
 import logodash from "../assets/logo-dash.png";
 

@@ -7,7 +7,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import TicketsManager from "../../components/TicketsManager/";
 import Ticket from "../../components/Ticket/";
 
-import { i18n } from "../../translate/i18n";
+/* import { i18n } from "../../translate/i18n"; */
 import Hidden from "@material-ui/core/Hidden";
 
 import logo from "../../assets/Logo_circle.png";
