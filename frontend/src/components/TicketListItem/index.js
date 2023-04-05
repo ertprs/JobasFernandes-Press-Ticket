@@ -68,12 +68,12 @@ const useStyles = makeStyles(theme => ({
 		justifySelf: "flex-end",
 	},
 
-/* 	closedBadge: {
-		alignSelf: "center",
-		justifySelf: "flex-end",
-		marginRight: 50,
-		marginLeft: "auto",
-	}, */
+	/* 	closedBadge: {
+			alignSelf: "center",
+			justifySelf: "flex-end",
+			marginRight: 50,
+			marginLeft: "auto",
+		}, */
 
 	contactLastMessage: {
 		flexWrap: "wrap",
@@ -91,8 +91,6 @@ const useStyles = makeStyles(theme => ({
 
 	bottomButton: {
 		position: "relative",
-		height: "10px",
-		width: "10px",
 	},
 
 	badgeStyle: {
@@ -322,8 +320,8 @@ const TicketListItem = ({ ticket }) => {
 				</Tooltip>
 				<ListItemAvatar>
 					<Avatar style={{
-						height: 50,
-						width: 50,
+						height: 60,
+						width: 60,
 						borderRadius: 4,
 						marginLeft: -5,
 						marginRight: 5
@@ -464,25 +462,33 @@ const TicketListItem = ({ ticket }) => {
 				/>
 				{(ticket.status === "pending" && (ticket.queue === null || ticket.queue === undefined)) && (
 					<Tooltip title={i18n.t("ticketsList.items.accept")}>
-						<IconButton
-							style={{ background: 'green', color: 'white', bottom: '-20px', borderRadius: '15px', border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
+						<DoneIcon
+							style={{
+								color: 'green',
+								bottom: '-20px',
+								borderRadius: "15px",
+								left: '8px',
+								fontSize: "22px"
+							}}
 							className={classes.bottomButton}
-							color="primary"
 							onClick={e => handleOpenAcceptTicketWithouSelectQueue()}
-							loading={loading}>
-							<DoneIcon />
-						</IconButton>
+							loading={loading}
+						/>
 					</Tooltip>
 				)}
 				{ticket.status === "pending" && ticket.queue !== null && (
 					<Tooltip title={i18n.t("ticketsList.items.accept")}>
-						<IconButton
-							style={{ background: 'green', color: 'white', bottom: '-20px', borderRadius: '15px', border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
+						<DoneIcon
+							style={{
+								color: 'green',
+								bottom: '-20px',
+								borderRadius: "15px",
+								left: '8px',
+								fontSize: "22px"
+							}}
 							className={classes.bottomButton}
-							color="primary"
-							onClick={e => handleAcepptTicket(ticket.id)} >
-							<DoneIcon />
-						</IconButton>
+							onClick={e => handleAcepptTicket(ticket.id)}
+						/>
 					</Tooltip>
 				)}
 				{/* {ticket.status === "pending" && (
@@ -507,35 +513,49 @@ const TicketListItem = ({ ticket }) => {
 				)} */}
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.return")}>
-						<IconButton
-							style={{ background: '#FFD700', color: 'white', marginRight: "5px", bottom: '-20px', borderRadius: '15px', border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
+						<ReplayIcon
 							className={classes.bottomButton}
-							color="primary"
-							onClick={e => handleViewTicket(ticket.id)} >
-							<ReplayIcon />
-						</IconButton>
+							style={{
+								color: 'black',
+								marginRight: "5px",
+								bottom: '-20px',
+								borderRadius: '15px',
+								left: '8px',
+								fontSize: "18px"
+							}}
+							onClick={e => handleViewTicket(ticket.id)}
+						/>
 					</Tooltip>
 				)}
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.close")}>
-						<IconButton
-							style={{ background: '#cf0e00', color: 'white', bottom: '-20px', borderRadius: "15px", border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
+						<ClearOutlinedIcon
+							style={{
+								color: '#cf0e00',
+								bottom: '-20px',
+								borderRadius: "15px",
+								left: '8px',
+								fontSize: "22px"
+							}}
 							className={classes.bottomButton}
 							color="primary"
-							onClick={e => handleClosedTicket(ticket.id)} >
-							<ClearOutlinedIcon />
-						</IconButton>
+							onClick={e => handleClosedTicket(ticket.id)}
+						/>
 					</Tooltip>
 				)}
 				{ticket.status === "closed" && (
 					<Tooltip title={i18n.t("ticketsList.items.reopen")}>
-						<IconButton
-							style={{ background: 'green', color: 'white', bottom: '-20px', borderRadius: "15px", border: "2px solid #CCC", left: '8px', fontSize: '0.4rem' }}
+						<ReplayIcon
+							style={{
+								color: 'green',
+								bottom: '-20px',
+								borderRadius: "15px",
+								left: '8px',
+								fontSize: "22px"
+							}}
 							className={classes.bottomButton}
-							color="primary"
-							onClick={e => handleReopenTicket(ticket.id)} >
-							<ReplayIcon />
-						</IconButton>
+							onClick={e => handleReopenTicket(ticket.id)}
+						/>
 					</Tooltip>
 				)}
 			</ListItem>
