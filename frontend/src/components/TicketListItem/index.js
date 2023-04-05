@@ -242,7 +242,7 @@ const TicketListItem = ({ ticket }) => {
 		history.push(`/tickets/${id}`);
 	};
 
-	const handleClosedTicket = async (id) => {
+	const handleClosedTicket = async id => {
 		setTag(ticket?.tags);
 		setLoading(true);
 		try {
