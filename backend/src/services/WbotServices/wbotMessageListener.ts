@@ -154,11 +154,62 @@ const verifyMediaMessage = async (
     logger.error(err);
   }
 
+  let $tipoArquivo: string;
+
+  switch (media.mimetype.split("/")[0]) {
+    case 'audio':
+      $tipoArquivo = '🔉 Mensagem de audio';
+      break;
+
+    case 'image':
+      $tipoArquivo = '🖼️ Arquivo de imagem';
+      break;
+
+    case 'video':
+      $tipoArquivo = '🎬 Arquivo de vídeo';
+      break;
+
+    case 'document':
+      $tipoArquivo = '📘 Documento';
+      break;
+
+    case 'application':
+      $tipoArquivo = '📎 Documento';
+      break;
+
+    case 'ciphertext':
+      $tipoArquivo = '⚠️ Notificação';
+      break;
+
+    case 'e2e_notification':
+      $tipoArquivo = '⛔ Notificação';
+      break;
+
+    case 'revoked':
+      $tipoArquivo = '❌ Apagado';
+      break;
+    default:
+      $tipoArquivo = '📎 Arquivo';
+      break;
+  }
+
+  let $strBody: string;
+
+  if (msg.fromMe === true) {
+
+    $strBody = msg.body; //+ ' x1 ' || media.filename  + ' x2 ' ;
+
+  } else {
+
+    $strBody = msg.body;//+ ' x3 ' || media.filename  + ' x4 ' ;
+
+  }
+
   const messageData = {
     id: msg.id.id,
     ticketId: ticket.id,
     contactId: msg.fromMe ? undefined : contact.id,
-    body: msg.body || media.filename,
+    body: $strBody,
     fromMe: msg.fromMe,
     read: msg.fromMe,
     mediaUrl: media.filename,
@@ -166,7 +217,12 @@ const verifyMediaMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
-  await ticket.update({ lastMessage: msg.body || media.filename });
+  if (msg.fromMe == true) {
+    await ticket.update({ lastMessage: $tipoArquivo });
+  } else {
+    await ticket.update({ lastMessage: $tipoArquivo });
+  }
+
   const newMessage = await CreateMessageService({ messageData });
 
   return newMessage;
@@ -2050,7 +2106,7 @@ const handleMessage = async (
     let queueId: number = 0;
     let tagsId: number = 0;
     let userId: number = 0;
-    
+
     // console.log(msg)
     if (msg.fromMe) {
       // messages sent automatically by wbot have a special character in front of it
