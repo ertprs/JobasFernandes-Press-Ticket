@@ -197,11 +197,11 @@ const verifyMediaMessage = async (
 
   if (msg.fromMe === true) {
 
-    $strBody = msg.body; //+ ' x1 ' || media.filename  + ' x2 ' ;
+    $strBody = msg.body;
 
   } else {
 
-    $strBody = msg.body;//+ ' x3 ' || media.filename  + ' x4 ' ;
+    $strBody = msg.body;
 
   }
 
@@ -218,9 +218,9 @@ const verifyMediaMessage = async (
   };
 
   if (msg.fromMe == true) {
-    await ticket.update({ lastMessage: $tipoArquivo });
+    await ticket.update({ lastMessage: $tipoArquivo + " " +  "🢅" || $tipoArquivo + " " +  "🢅"});
   } else {
-    await ticket.update({ lastMessage: $tipoArquivo });
+    await ticket.update({ lastMessage: "🢇" + " " + $tipoArquivo ||  "🢇" + " " + $tipoArquivo });
   }
 
   const newMessage = await CreateMessageService({ messageData });
@@ -238,7 +238,7 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   return msg;
 };
 
-export const verifyMessage = async (
+const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact
@@ -257,15 +257,25 @@ export const verifyMessage = async (
     quotedMsgId: quotedMsg?.id
   };
 
-  await ticket.update({
-    lastMessage:
-      msg.type === "location"
-        ? msg.location.description
-          ? `Localization - ${msg.location.description.split("\\n")[0]}`
-          : "Localization"
-        : msg.body
-  });
-
+  if (msg.fromMe == true) {
+    await ticket.update({//texto que sai do chat tb,
+      lastMessage:
+        msg.type === "location"
+          ? msg.location.description
+            ? `Localization - ${msg.location.description.split("\\n")[0]} + " " +  "🢅"`
+            : "🗺️:" + "Localization" + " " +  "🢅"
+          : msg.body + " " +  "🢅"
+    });
+  } else {
+    await ticket.update({//aqui mapei texto que chega do chat
+      lastMessage:
+        msg.type === "location"
+          ? msg.location.description
+            ? "🢇" + " - 🗺️:" + `Localization - ${msg.location.description.split("\\n")[0]}`
+            : "🢇" + " - 🗺️:" + "Localization"
+          : "🢇" + " " + msg.body
+    });
+  }
   await CreateMessageService({ messageData });
 };
 
