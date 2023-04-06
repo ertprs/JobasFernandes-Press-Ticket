@@ -26,6 +26,8 @@ import toastError from "../../errors/toastError";
 import AcceptTicketWithouSelectQueue from "../AcceptTicketWithoutQueueModal";
 import { system } from "../../config.json";
 import { Can } from "../Can";
+import receiveIcon from "../../assets/receive.png";
+import sendIcon from "../../assets/send.png";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
@@ -373,8 +375,25 @@ const TicketListItem = ({ ticket }) => {
 								variant="body2"
 								color="textSecondary"
 							>
+								{(() => {
+									if (ticket.lastMessage) {
+										if (ticket.lastMessage.includes("🢅") === true) {
+											return (
+												<img src={sendIcon} alt="Msg Enviada" width="12px" />
+											)
+										} else if (ticket.lastMessage.includes("🢇") === true) {
+
+											return (
+												<img src={receiveIcon} alt="Msg Recebida" width="12px" />
+											)
+										}
+									}
+								})()}
+
 								{ticket.lastMessage ? (
-									<MarkdownWrapper>{ticket.lastMessage}</MarkdownWrapper>
+									<MarkdownWrapper>{ticket.lastMessage
+										.replace("🢇", "")
+										.replace("🢅", "")}</MarkdownWrapper>
 								) : (
 									<br />
 								)}

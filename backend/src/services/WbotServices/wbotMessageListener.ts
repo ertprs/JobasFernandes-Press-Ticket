@@ -218,9 +218,9 @@ const verifyMediaMessage = async (
   };
 
   if (msg.fromMe == true) {
-    await ticket.update({ lastMessage: $tipoArquivo + " " +  "🢅" || $tipoArquivo + " " +  "🢅"});
+    await ticket.update({ lastMessage: "🢅" + "⠀" + $tipoArquivo || "🢅" + "⠀" + $tipoArquivo });
   } else {
-    await ticket.update({ lastMessage: "🢇" + " " + $tipoArquivo ||  "🢇" + " " + $tipoArquivo });
+    await ticket.update({ lastMessage: "🢇" + "⠀" + $tipoArquivo || "🢇" + "⠀" + $tipoArquivo });
   }
 
   const newMessage = await CreateMessageService({ messageData });
@@ -262,18 +262,18 @@ const verifyMessage = async (
       lastMessage:
         msg.type === "location"
           ? msg.location.description
-            ? `Localization - ${msg.location.description.split("\\n")[0]} + " " +  "🢅"`
-            : "🗺️:" + "Localization" + " " +  "🢅"
-          : msg.body + " " +  "🢅"
+            ? "🢅" + "⠀" + `Localization - ${msg.location.description.split("\\n")[0]}`
+            : "🢅" + "⠀" + "🗺️:" + "Localization"
+          : "🢅" + "⠀" + msg.body
     });
   } else {
     await ticket.update({//aqui mapei texto que chega do chat
       lastMessage:
         msg.type === "location"
           ? msg.location.description
-            ? "🢇" + " - 🗺️:" + `Localization - ${msg.location.description.split("\\n")[0]}`
-            : "🢇" + " - 🗺️:" + "Localization"
-          : "🢇" + " " + msg.body
+            ? "🢇" + "⠀" + "🗺️:" + `Localization - ${msg.location.description.split("\\n")[0]}`
+            : "🢇" + "⠀" + "🗺️:" + "Localization"
+          : "🢇" + "⠀" + msg.body
     });
   }
   await CreateMessageService({ messageData });
