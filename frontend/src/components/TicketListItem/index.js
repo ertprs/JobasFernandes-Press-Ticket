@@ -13,12 +13,12 @@ import Typography from "@material-ui/core/Typography";
 import Avatar from "@material-ui/core/Avatar";
 import Divider from "@material-ui/core/Divider";
 import Badge from "@material-ui/core/Badge";
-import IconButton from '@material-ui/core/IconButton';
+import UndoRoundedIcon from '@material-ui/icons/UndoRounded';
 import { i18n } from "../../translate/i18n";
 import DoneIcon from '@material-ui/icons/Done';
 import ReplayIcon from '@material-ui/icons/Replay';
 import api from "../../services/api";
-import ClearOutlinedIcon from '@material-ui/icons/ClearOutlined';
+import CancelIcon from '@material-ui/icons/Cancel';
 import MarkdownWrapper from "../MarkdownWrapper";
 import { Tooltip } from "@material-ui/core";
 import { AuthContext } from "../../context/Auth/AuthContext";
@@ -532,7 +532,7 @@ const TicketListItem = ({ ticket }) => {
 				)} */}
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.return")}>
-						<ReplayIcon
+						<UndoRoundedIcon
 							className={classes.bottomButton}
 							style={{
 								color: 'black',
@@ -548,7 +548,7 @@ const TicketListItem = ({ ticket }) => {
 				)}
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.close")}>
-						<ClearOutlinedIcon
+						<CancelIcon
 							style={{
 								color: '#cf0e00',
 								bottom: '-20px',

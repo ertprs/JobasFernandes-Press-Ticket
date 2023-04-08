@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
 		backgroundColor: theme.palette.background.default,
 		alignItems: "center",
 		padding: theme.spacing(0, 1),
-		minHeight: "73px",
+		minHeight: "55px",
 		justifyContent: "flex-start",
 	},
 	content: {
