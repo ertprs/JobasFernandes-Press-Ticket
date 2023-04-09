@@ -43,7 +43,7 @@ const messages = {
           protocolNumber: "Protocolo",
           date: "Data",
           hour: "Hora",
-          ticket_id: "Ticked ID",
+          ticket_id: "Nº do Chamado",
           queue: "Setor",
           connection: "Conexão"
         }
@@ -328,7 +328,7 @@ const messages = {
       },
       tickets: {
         toasts: {
-          deleted: "O ticket que você estava foi deletado.",
+          deleted: "O chamado que você estava foi deletado.",
         },
         notification: {
           message: "Mensagem de",
@@ -579,7 +579,7 @@ const messages = {
             },
           },
           closeTicketApi: {
-            name: "Encerrar Ticket enviado API",
+            name: "Encerrar chamado enviado API",
             note: "Fecha automaticamente o chamado quando enviado por API",
             options: {
               enabled: "Ativado",
@@ -595,7 +595,7 @@ const messages = {
             },
           },
           ASC: {
-            name: "Ordenação dos Tickets (ASC ou DESC)",
+            name: "Ordenação dos chamados (Crescente ou Decrescente)",
             note: "Ao ativar irá ordenar ascendente (ASC), desativando ordenará decrescente (DESC)",
             options: {
               enabled: "Ativado",
@@ -603,8 +603,8 @@ const messages = {
             },
           },
           created: {
-            name: "Ordenação dos Tickets (createdAt ou updateAt)",
-            note: "Ao ativar irá ordenar pela data de criação (createdAt), desativando ordenará pela data de atualização (updateAt)",
+            name: "Ordenação dos chamados (Criação ou Atualização)",
+            note: "Ao ativar irá ordenar pela data de criação, desativando ordenará pela data de atualização",
 
             options: {
               enabled: "Ativado",

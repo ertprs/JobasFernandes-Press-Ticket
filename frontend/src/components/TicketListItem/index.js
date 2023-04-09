@@ -32,6 +32,7 @@ import sendIcon from "../../assets/send.png";
 const useStyles = makeStyles(theme => ({
 	ticket: {
 		position: "relative",
+		height: "70px",
 	},
 
 	pendingTicket: {
@@ -336,10 +337,13 @@ const TicketListItem = ({ ticket }) => {
 					primary={
 						<span className={classes.contactNameWrapper}>
 							<Typography
+							style={{
+                                fontWeight: "bold",
+							}}
 								noWrap
 								component="span"
 								variant="body2"
-								color="textPrimary"
+								color="textSecondary"
 							>
 								{ticket.contact.name}
 							</Typography>
