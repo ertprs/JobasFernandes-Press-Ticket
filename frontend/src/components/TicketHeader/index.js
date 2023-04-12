@@ -43,6 +43,7 @@ const TicketHeader = ({ loading, children }) => {
               left: '8px',
               fontSize: "22px"
             }}
+            cursor="pointer"
             className={classes.bottomButton}
             onClick={handleBack}
           />

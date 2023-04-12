@@ -112,6 +112,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
     isDefault: false,
     isDisplay: false,
     transferTicketMessage: "",
+    isGroup: false,
   };
   const [whatsApp, setWhatsApp] = useState(initialState);
   const [selectedQueueIds, setSelectedQueueIds] = useState([]);
@@ -394,6 +395,17 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                       />
                     }
                     label={i18n.t("whatsappModal.form.display")}
+                  />
+                   <FormControlLabel
+                    control={
+                      <Field
+                        as={Switch}
+                        color="primary"
+                        name="isGroup"
+                        checked={values.isGroup}
+                      />
+                    }
+                    label={i18n.t("whatsappModal.form.group")}
                   />
                 </div>
                 <div>

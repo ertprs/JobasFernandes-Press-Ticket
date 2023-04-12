@@ -62,6 +62,7 @@ interface Request {
   status?: string;
   isDefault?: boolean;
   isDisplay?: boolean;
+  isGroup?: boolean;
 }
 
 interface Response {
@@ -125,7 +126,8 @@ const CreateWhatsAppService = async ({
 
   ratingMessage,
   isDefault = false,
-  isDisplay = false
+  isDisplay = false,
+  isGroup = false,
 }: Request): Promise<Response> => {
   const schema = Yup.object().shape({
     name: Yup.string()
@@ -146,7 +148,7 @@ const CreateWhatsAppService = async ({
   });
 
   try {
-    await schema.validate({ name, status, isDefault });
+    await schema.validate({ name, status, isDefault , isGroup});
   } catch (err) {
     throw new AppError(err.message);
   }
@@ -154,6 +156,8 @@ const CreateWhatsAppService = async ({
   const whatsappFound = await Whatsapp.findOne();
 
   isDefault = !whatsappFound;
+
+  isGroup = !whatsappFound;
 
   let oldDefaultWhatsapp: Whatsapp | null = null;
 
@@ -165,6 +169,15 @@ const CreateWhatsAppService = async ({
       await oldDefaultWhatsapp.update({ isDefault: false });
     }
   }
+
+  if (isGroup) {
+    oldDefaultWhatsapp = await Whatsapp.findOne({
+      where: { isGroup: true }
+    });
+    if (oldDefaultWhatsapp) {
+      await oldDefaultWhatsapp.update({ isGroup: false });
+    }
+  }  
 
   if (queueIds.length > 1 && !greetingMessage) {
     throw new AppError("ERR_WAPP_GREETING_REQUIRED");
@@ -225,7 +238,8 @@ const CreateWhatsAppService = async ({
 
       ratingMessage,
       isDefault,
-      isDisplay
+      isDisplay,
+      isGroup
     },
     { include: ["queues"] }
   );

@@ -17,6 +17,7 @@ import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
 import Message from "../../models/Message";
 import Settings from "../../models/Setting";
+import Whatsapp from "../../models/Whatsapp";
 
 import { getIO } from "../../libs/socket";
 import CreateMessageService from "../MessageServices/CreateMessageService";
@@ -34,6 +35,7 @@ import formatBody from "../../helpers/Mustache";
 import UserRating from "../../models/UserRating";
 import SendWhatsAppMessage from "./SendWhatsAppMessage";
 import Queue from "../../models/Queue";
+import { boolean } from "yup";
 
 interface Session extends Client {
   id?: number;
@@ -330,13 +332,8 @@ const verifyQueue = async (
     EndDefineWorkHoursSaturday,
     StartDefineWorkHoursSaturdayLunch,
     EndDefineWorkHoursSaturdayLunch
-
-
-
   } = await ShowWhatsaAppHours(
     wbot.id!
-
-
   );
 
   //Verificando se está habilitado dias de expediente
@@ -2090,12 +2087,15 @@ const handleMessage = async (
   if (!isValidMsg(msg)) {
     return;
   }
+  const showMessageGroupConnection = await ShowWhatsAppService(wbot.id!);
 
   // IGNORAR MENSAGENS DE GRUPO
   const Settingdb = await Settings.findOne({
     where: { key: "CheckMsgIsGroup" }
   });
-  if (Settingdb?.value === "enabled") {
+  if (showMessageGroupConnection.isGroup) {
+  }
+  else if (Settingdb?.value === "enabled" || !showMessageGroupConnection.isGroup) {
     const chat = await msg.getChat();
     if (
       msg.type === "sticker" ||

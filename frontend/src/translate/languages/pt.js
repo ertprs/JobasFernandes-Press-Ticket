@@ -123,6 +123,7 @@ const messages = {
           name: "Nome",
           default: "Padrão",
           display: "Exibir horário dos setores",
+          group: "Permitir mensagens de grupos",
           farewellMessage: "Mensagem de despedida",
           ratingMessage: "Mensagem de avaliação",
           instructionRatingMessage: "Para habilitar as avaliações, basta preencher este campo",

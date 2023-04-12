@@ -63,6 +63,7 @@ interface WhatsappData {
   ratingMessage?: string;
   queueIds?: number[];
   isDisplay?: boolean;
+  isGroup?: boolean;
 }
 
 interface Request {
@@ -82,7 +83,8 @@ const UpdateWhatsAppService = async ({
   const schema = Yup.object().shape({
     name: Yup.string().min(2),
     status: Yup.string(),
-    isDefault: Yup.boolean()
+    isDefault: Yup.boolean(),
+    isGroup: Yup.boolean()
   });
 
   const {
@@ -141,6 +143,7 @@ const UpdateWhatsAppService = async ({
 
     ratingMessage,
     isDisplay,
+    isGroup,
     queueIds = []
   } = whatsappData;
 
@@ -162,6 +165,15 @@ const UpdateWhatsAppService = async ({
     });
     if (oldDefaultWhatsapp) {
       await oldDefaultWhatsapp.update({ isDefault: false });
+    }
+  }
+
+  if (isGroup) {
+    oldDefaultWhatsapp = await Whatsapp.findOne({
+      where: { isGroup: true, id: { [Op.not]: whatsappId } }
+    });
+    if (oldDefaultWhatsapp) {
+      await oldDefaultWhatsapp.update({ isGroup: false });
     }
   }
 
@@ -222,7 +234,8 @@ const UpdateWhatsAppService = async ({
     
     ratingMessage,
     isDefault,
-    isDisplay
+    isDisplay,
+    isGroup
   });
 
   await AssociateWhatsappQueue(whatsapp, queueIds);
