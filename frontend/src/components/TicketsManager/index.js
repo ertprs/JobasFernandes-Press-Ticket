@@ -187,6 +187,7 @@ const TicketsManager = () => {
               <Badge
                 className={classes.badge}
                 badgeContent={openCount}
+                overlap="rectangular"
                 color="secondary"
               >
                 {i18n.t("tickets.tabs.open.title")}
@@ -201,6 +202,7 @@ const TicketsManager = () => {
               <Badge
                 className={classes.badge}
                 badgeContent={pendingCount}
+                overlap="rectangular"
                 color="secondary"
               >
                 {i18n.t("ticketsList.pendingHeader")}

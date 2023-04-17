@@ -4,8 +4,10 @@ import { Card } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import TicketHeaderSkeleton from "../TicketHeaderSkeleton";
 import ArrowBackIos from "@material-ui/icons/ArrowBackIos";
+import { i18n } from "../../translate/i18n";
+import Tooltip from '@material-ui/core/Tooltip';
 import { useHistory } from "react-router-dom";
-import { green } from "@material-ui/core/colors";
+import { system } from "../../config.json";
 
 const useStyles = makeStyles((theme) => ({
   ticketHeader: {
@@ -32,21 +34,23 @@ const TicketHeader = ({ loading, children }) => {
         <TicketHeaderSkeleton />
       ) : (
         <Card square className={classes.ticketHeader}>
-          <ArrowBackIos
-            style={{
-              backgroundColor: "green",
-              padding: 3,
-              paddingLeft: "7px",
-              alignSelf: "center",
-              color: "#FFF",
-              borderRadius: "15px",
-              left: '8px',
-              fontSize: "22px"
-            }}
-            cursor="pointer"
-            className={classes.bottomButton}
-            onClick={handleBack}
-          />
+          <Tooltip title={i18n.t("messagesList.header.buttons.back")}>
+            <ArrowBackIos
+              style={{
+                backgroundColor: system.color.lightTheme.palette.primary,
+                padding: 3,
+                paddingLeft: "7px",
+                alignSelf: "center",
+                color: "#FFF",
+                borderRadius: "30px",
+                left: '8px',
+                fontSize: "22px"
+              }}
+              cursor="pointer"
+              className={classes.bottomButton}
+              onClick={handleBack}
+            />
+          </Tooltip>
           {children}
         </Card>
       )}

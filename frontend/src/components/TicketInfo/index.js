@@ -2,8 +2,6 @@ import React from "react";
 
 import { Avatar, CardHeader } from "@material-ui/core";
 
-import { i18n } from "../../translate/i18n";
-
 const TicketInfo = ({ contact, ticket, onClick }) => {
 	return (
 		<CardHeader

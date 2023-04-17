@@ -634,11 +634,13 @@ const messages = {
         header: {
           assignedTo: "Assignee:",
           buttons: {
+            back: "Back",
             return: "Return",
             resolve: "Solve",
             reopen: "Reopen",
             accept: "Accept",
             finish: "Finish",
+            more: "More",
           },
         },
       },

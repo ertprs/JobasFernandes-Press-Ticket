@@ -107,7 +107,6 @@ const UserModal = ({ open, onClose, userId }) => {
 	const [showPassword, setShowPassword] = useState(false);
 	const [whatsappId, setWhatsappId] = useState(false);
 	const { loading, whatsApps } = useWhatsApps();
-	const allHistoric = useRef();
 	const startWorkRef = useRef();
 	const endWorkRef = useRef();
 

@@ -658,11 +658,13 @@ const messages = {
         header: {
           assignedTo: "Responsável:",
           buttons: {
+            back: "Voltar",
             return: "Retornar",
             resolve: "Resolver",
             reopen: "Reabrir",
             accept: "Aceitar",
             finish: "Finalizar",
+            more: "Mais",
           },
         },
       },

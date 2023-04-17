@@ -1,8 +1,7 @@
 import React, { useContext, useState } from "react";
 import { useHistory } from "react-router-dom";
 
-import { makeStyles, createTheme, ThemeProvider } from "@material-ui/core/styles";
-import { IconButton } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import { MoreVert, Replay } from "@material-ui/icons";
 
 import { i18n } from "../../translate/i18n";
@@ -14,7 +13,6 @@ import CheckCircleIcon from '@material-ui/icons/CheckCircle';
 import UndoRoundedIcon from '@material-ui/icons/UndoRounded';
 import CancelIcon from '@material-ui/icons/Cancel';
 import Tooltip from '@material-ui/core/Tooltip';
-import { green, red } from '@material-ui/core/colors';
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -26,6 +24,10 @@ const useStyles = makeStyles(theme => ({
 			margin: theme.spacing(0),
 		},
 	},
+	bottomButton: {
+		position: "relative",
+		cursor: "pointer",
+	},
 }));
 
 const TicketActionButtons = ({ ticket }) => {
@@ -35,13 +37,6 @@ const TicketActionButtons = ({ ticket }) => {
 	const [loading, setLoading] = useState(false);
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
-
-	const customTheme = createTheme({
-		palette: {
-			primary: green,
-			secondary: red,
-		}
-	});
 
 	const handleOpenTicketOptionsMenu = e => {
 		setAnchorEl(e.currentTarget);
@@ -75,28 +70,55 @@ const TicketActionButtons = ({ ticket }) => {
 		<div className={classes.actionButtons}>
 			{ticket.status === "closed" && (
 				<Tooltip title={i18n.t("messagesList.header.buttons.reopen")}>
-					<IconButton loading={loading} style={{ marginRight: 20 }} onClick={e => handleUpdateTicketStatus(e, "open", user?.id)} color="primary">
-						<Replay />
-					</IconButton>
+					<Replay
+						loading={loading}
+						style={{
+							marginRight: 7,
+							fontSize: "26px",
+							marginBottom: -10,
+						}}
+						className={classes.bottomButton}
+						color="primary"
+						onClick={e => handleUpdateTicketStatus(e, "open", user?.id)} />
 				</Tooltip>
 			)}
 			{ticket.status === "open" && (
 				<>
 					<Tooltip title={i18n.t("messagesList.header.buttons.return")}>
-						<IconButton loading={loading} onClick={e => handleUpdateTicketStatus(e, "pending", null)}>
-							<UndoRoundedIcon />
-						</IconButton>
+						<UndoRoundedIcon
+							loading={loading}
+							style={{
+								marginRight: 7,
+								fontSize: "22px",
+								marginBottom: -10,
+							}}
+							className={classes.bottomButton}
+							color="primary"
+							onClick={e => handleUpdateTicketStatus(e, "pending", null)} />
 					</Tooltip>
-					<ThemeProvider theme={customTheme}>
-						<Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
-							<IconButton loading={loading} onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)} color="secondary">
-								<CancelIcon />
-							</IconButton>
-						</Tooltip>
-					</ThemeProvider>
-					<IconButton loading={loading} onClick={handleOpenTicketOptionsMenu}>
-						<MoreVert />
-					</IconButton>
+					<Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
+						<CancelIcon
+							loading={loading}
+							style={{
+								fontSize: "22px",
+								marginBottom: -10,
+							}}
+							className={classes.bottomButton}
+							color="primary"
+							onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)} />
+					</Tooltip>
+					<Tooltip title={i18n.t("messagesList.header.buttons.more")}>
+						<MoreVert
+							loading={loading}
+							style={{
+								marginLeft: 7,
+								marginRight: 7,
+								fontSize: "22px",
+								marginBottom: -10,
+							}}
+							className={classes.bottomButton}
+							onClick={handleOpenTicketOptionsMenu} />
+					</Tooltip>
 					<TicketOptionsMenu
 						ticket={ticket}
 						anchorEl={anchorEl}
@@ -107,9 +129,16 @@ const TicketActionButtons = ({ ticket }) => {
 			)}
 			{ticket.status === "pending" && (
 				<Tooltip title={i18n.t("messagesList.header.buttons.accept")}>
-					<IconButton loading={loading} style={{ marginRight: 20 }} onClick={e => handleUpdateTicketStatus(e, "open", user?.id)} color="primary">
-						<CheckCircleIcon />
-					</IconButton>
+					<CheckCircleIcon
+						loading={loading}
+						style={{
+							marginRight: 10,
+							marginBottom: -10,
+							fontSize: "22px",
+						}}
+						className={classes.bottomButton}
+						onClick={e => handleUpdateTicketStatus(e, "open", user?.id)}
+						color="primary" />
 				</Tooltip>
 			)}
 		</div>

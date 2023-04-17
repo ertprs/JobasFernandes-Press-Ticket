@@ -19,7 +19,6 @@ import {
   FormControl,
   FormGroup,
   Tooltip,
-  Paper,
   Grid,
   Checkbox,
 } from "@material-ui/core";
@@ -155,10 +154,6 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
   const [StartDefineWorkHoursSundayLunch, setStartDefineWorkHoursSundayLunch] = useState("12:00");
   const [EndDefineWorkHoursSundayLunch, setEndDefineWorkHoursSundayLunch] = useState("13:00");
 
-  const [startWorkHour, setStartWorkHour] = useState("08:00");
-  const [endWorkHour, setEndWorkHour] = useState("17:30");
-  const [startWorkHourWeekend, setStartWorkHourWeekend] = useState("08:00");
-  const [endWorkHourWeekend, setEndWorkHourWeekend] = useState("17:30");
   const [seg, setSeg] = useState(true);
   const [ter, setTer] = useState(true);
   const [quar, setQuar] = useState(true);
@@ -217,14 +212,8 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
         setStartDefineWorkHoursSundayLunch(data.StartDefineWorkHoursSundayLunch);
         setEndDefineWorkHoursSundayLunch(data.EndDefineWorkHoursSundayLunch);
 
-
-
         SetDefineWorkHours(data.defineWorkHours);
         setOutOfWorkMessage(data.outOfWorkMessage);
-        setStartWorkHour(data.startWorkHour);
-        setEndWorkHour(data.endWorkHour);
-        setStartWorkHourWeekend(data.startWorkHourWeekend);
-        setEndWorkHourWeekend(data.endWorkHourWeekend);
 
         const whatsQueueIds = data.queues?.map(queue => queue.id);
         setSelectedQueueIds(whatsQueueIds);
@@ -468,7 +457,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                 <div>
                   {/* Expediente */}
 
-                  {defineWorkHours == true ? (
+                  {defineWorkHours === true ? (
                     <div
                     // className={classes.textoExpediente}
                     >
@@ -531,7 +520,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                       </FormControl>
                     </Grid>
                   </Grid>
-                  {defineWorkHours == true ? (
+                  {defineWorkHours === true ? (
                     <>
                       <Grid item xs={12} sm={12} className={classes.diasSemana} >
                         <FormControl component="fieldset" sx={{ display: "flex", justifyContent: "center" }}>

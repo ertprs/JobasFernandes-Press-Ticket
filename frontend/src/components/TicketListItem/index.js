@@ -16,7 +16,6 @@ import Badge from "@material-ui/core/Badge";
 import UndoRoundedIcon from '@material-ui/icons/UndoRounded';
 import { i18n } from "../../translate/i18n";
 import DoneIcon from '@material-ui/icons/Done';
-import ReplayIcon from '@material-ui/icons/Replay';
 import api from "../../services/api";
 import CancelIcon from '@material-ui/icons/Cancel';
 import MarkdownWrapper from "../MarkdownWrapper";
@@ -25,14 +24,14 @@ import { AuthContext } from "../../context/Auth/AuthContext";
 import toastError from "../../errors/toastError";
 import AcceptTicketWithouSelectQueue from "../AcceptTicketWithoutQueueModal";
 import { system } from "../../config.json";
-import { Can } from "../Can";
+import { Can } from "../../components/Can";
 import receiveIcon from "../../assets/receive.png";
 import sendIcon from "../../assets/send.png";
 
 const useStyles = makeStyles(theme => ({
 	ticket: {
 		position: "relative",
-		height: "70px",
+		display: "flex",
 	},
 
 	pendingTicket: {
@@ -64,32 +63,21 @@ const useStyles = makeStyles(theme => ({
 
 	contactNameWrapper: {
 		display: "flex",
-		justifyContent: "space-between",
+		justifyContent: "space-between"
 	},
 
 	lastMessageTime: {
-		justifySelf: "flex-end",
+		justifySelf: "flex-end"
 	},
 
-	/* 	closedBadge: {
-			alignSelf: "center",
-			justifySelf: "flex-end",
-			marginRight: 50,
-			marginLeft: "auto",
-		}, */
-
 	contactLastMessage: {
-		flexWrap: "wrap",
+		flexWrap: "wrap"
 	},
 
 	newMessagesCount: {
-		position: "absolute",
 		alignSelf: "center",
 		marginRight: 8,
 		marginLeft: "auto",
-		top: "20px",
-		right: "14px",
-		borderRadius: 0,
 	},
 
 	bottomButton: {
@@ -106,7 +94,14 @@ const useStyles = makeStyles(theme => ({
 		left: "50%",
 	},
 
-	userTag: {
+	ticketQueueColor: {
+		flex: "none",
+		width: "5px",
+		height: "100%",
+		position: "absolute",
+		top: "0%",
+		left: "0%",
+	}, Tag: {
 		position: "absolute",
 		marginRight: 5,
 		right: 20,
@@ -133,15 +128,7 @@ const useStyles = makeStyles(theme => ({
 			transform: "scale(1) translate(0%, -40%)",
 		},
 
-	},
-	ticketQueueColor: {
-		flex: "none",
-		width: "8px",
-		height: "100%",
-		position: "absolute",
-		top: "0%",
-		left: "0%",
-	},
+	}
 }));
 
 const TicketListItem = ({ ticket }) => {
@@ -153,7 +140,6 @@ const TicketListItem = ({ ticket }) => {
 	const { user } = useContext(AuthContext);
 	const [acceptTicketWithouSelectQueueOpen, setAcceptTicketWithouSelectQueueOpen] = useState(false);
 	const [tag, setTag] = useState([]);
-	const [ticketQueueColor, setTicketQueueColor] = useState(null);
 
 	useEffect(() => {
 		const delayDebounceFn = setTimeout(() => {
@@ -173,14 +159,13 @@ const TicketListItem = ({ ticket }) => {
 				clearTimeout(delayDebounceFn);
 			}
 		};
-	}, [ticketId, user, history]);
+	}, [ticketId, user, history, ticket.id]);
 
 	useEffect(() => {
-		setTicketQueueColor(ticket.queue?.color);
 		return () => {
 			isMounted.current = false;
 		};
-	}, []);
+	}, [ticket.id]);
 
 	const ContactTag = ({ tag }) => {
 
@@ -218,8 +203,20 @@ const TicketListItem = ({ ticket }) => {
 			setLoading(false);
 		}
 		history.push(`/tickets/${id}`);
-	};
-
+	}; const queueName = selectedTicket => {
+		let name = null;
+		let color = null;
+		user.queues.forEach(userQueue => {
+			if (userQueue.id === selectedTicket.queueId) {
+				name = userQueue.name;
+				color = userQueue.color;
+			}
+		});
+		return {
+			name,
+			color
+		};
+	}
 	const handleOpenAcceptTicketWithouSelectQueue = () => {
 		setAcceptTicketWithouSelectQueueOpen(true);
 	};
@@ -258,13 +255,11 @@ const TicketListItem = ({ ticket }) => {
 	};
 
 	const handleClosedTicket = async id => {
-		setTag(ticket?.tags);
 		setLoading(true);
 		try {
 			await api.put(`/tickets/${id}`, {
 				status: "closed",
 				userId: user?.id,
-				queueId: ticket?.queue?.id
 			});
 		} catch (err) {
 			setLoading(false);
@@ -273,7 +268,7 @@ const TicketListItem = ({ ticket }) => {
 		if (isMounted.current) {
 			setLoading(false);
 		}
-		history.push(`/tickets/`);
+		history.push(`/tickets/${id}`);
 	};
 
 	const handleSelectTicket = id => {
@@ -293,7 +288,7 @@ const TicketListItem = ({ ticket }) => {
 				});
 				setUserName(data['name']);
 			} catch (err) {
-				toastError(err);
+				// toastError(err);
 			}
 		};
 		fetchUserName();
@@ -318,8 +313,15 @@ const TicketListItem = ({ ticket }) => {
 					[classes.pendingTicket]: (ticket.status === "pending"),
 				})}
 			>
-				<Tooltip arrow placement="right" title={ticket.queue?.name?.toUpperCase() || "SEM FILA"} >
-					<span style={{ backgroundColor: ticket.queue?.color || "#7C7C7C" }} className={classes.ticketQueueColor}></span>
+				<Tooltip
+					arrow
+					placement="right"
+					title={ticket.queue?.name || queueName(ticket)?.name || i18n.t("ticketsList.items.queueless")}
+				>
+					<span
+						style={{ backgroundColor: ticket.queue?.color || queueName(ticket)?.color || "#7C7C7C" }}
+						className={classes.ticketQueueColor}
+					></span>
 				</Tooltip>
 				<ListItemAvatar>
 					<Avatar style={{
@@ -329,31 +331,23 @@ const TicketListItem = ({ ticket }) => {
 						marginLeft: -5,
 						marginRight: 5
 					}}
-						src={ticket?.contact?.profilePicUrl}
-					/>
+						src={ticket?.contact?.profilePicUrl} />
 				</ListItemAvatar>
 				<ListItemText
 					disableTypography
 					primary={
 						<span className={classes.contactNameWrapper}>
 							<Typography
-							style={{
-                                fontWeight: "bold",
-							}}
 								noWrap
 								component="span"
 								variant="body2"
 								color="textSecondary"
+								style={{
+									fontWeight: "bold",
+								}}
 							>
 								{ticket.contact.name}
 							</Typography>
-							{/* {ticket.status === "closed" && (
-								<Badge
-									className={classes.closedBadge}
-									badgeContent={"Fechado"}
-									color="primary"
-								/>
-							)} */}
 							{ticket.lastMessage && (
 								<Typography
 									className={classes.lastMessageTime}
@@ -393,45 +387,49 @@ const TicketListItem = ({ ticket }) => {
 										}
 									}
 								})()}
-
 								{ticket.lastMessage ? (
 									<MarkdownWrapper>{ticket.lastMessage
 										.replace("🢇", "")
 										.replace("🢅", "")}</MarkdownWrapper>
 								) : (
-									<br />
+									<p></p>	// <MarkdownWrapper>{ticket.lastMessage.slice(0, 20) + (ticket.lastMessage.length > 20 ? " ..." : "")}</MarkdownWrapper>
 								)}
 							</Typography>
 
 							<Badge
 								className={classes.newMessagesCount}
 								badgeContent={ticket.unreadMessages}
+								overlap="rectangular"
 								classes={{
 									badge: classes.badgeStyle,
-								}}
-							/>
+								}} />
 						</span>
 							<span className={classes.Radiusdot}>
-								<Tooltip title={i18n.t("ticketsList.connectionTitle")}>
-									<Badge
-										className={classes.Radiusdot} style={{
-											backgroundColor: system.color.lightTheme.palette.primary,
-											height: 20,
-											padding: 3,
-											marginRight: 5,
-											position: "inherit",
-											borderRadius: 4,
-											border: "2px solid #CCC",
-											color: "white"
-										}}
-										badgeContent={ticket.whatsapp?.name} />
-								</Tooltip>
+								{ticket.whatsappId && (
+									<Tooltip title={i18n.t("messageVariablesPicker.vars.connection")}>
+										<Badge
+											className={classes.Radiusdot}
+											style={{
+												backgroundColor: system.color.lightTheme.palette.primary,
+												height: 20,
+												padding: 3,
+												marginTop: 2,
+												marginRight: 5,
+												position: "inherit",
+												borderRadius: 4,
+												border: "2px solid #CCC",
+												color: "white"
+											}}
+											badgeContent={ticket.whatsapp?.name || i18n.t("userModal.form.user")}
+										/>
+									</Tooltip>
+								)}
 								<Can
 									role={user.profile}
 									perform="drawer-admin-items:view"
 									yes={() => (
 										<>
-											{uName && (
+											{uName && uName !== "" && (
 												<Tooltip title={i18n.t("messageVariablesPicker.vars.user")}>
 													<Badge
 														className={classes.Radiusdot}
@@ -445,29 +443,13 @@ const TicketListItem = ({ ticket }) => {
 															border: "2px solid #CCC",
 															color: "white",
 														}}
-														badgeContent={uName} />
+														badgeContent={uName}
+													/>
 												</Tooltip>
 											)}
 										</>
 									)}
 								/>
-							</span>
-							<span className={classes.Radiusdot}>
-								{/* <Tooltip title={i18n.t("ticketsList.items.queueSelected")}>
-									<Badge
-										style={{
-											backgroundColor: ticket.queue?.color || "#7C7C7C",
-											height: 20,
-											padding: 3,
-											marginRight: 3,
-											marginTop: "2px",
-											position: "inherit",
-											borderRadius: 4,
-											border: "2px solid #CCC",
-											color: "white"
-										}}
-										badgeContent={ticket.queue?.name || "SEM SETOR"} />
-								</Tooltip> */}
 								<Tooltip title={"Tags"}>
 									<span className={classes.Radiusdot}>
 										{
@@ -487,31 +469,27 @@ const TicketListItem = ({ ticket }) => {
 					<Tooltip title={i18n.t("ticketsList.items.accept")}>
 						<DoneIcon
 							style={{
-								color: 'green',
 								bottom: '-20px',
-								borderRadius: "15px",
-								left: '8px',
+								marginRight: '4px',
 								fontSize: "22px"
 							}}
 							className={classes.bottomButton}
+							color="primary"
 							onClick={e => handleOpenAcceptTicketWithouSelectQueue()}
-							loading={loading}
-						/>
+							loading={loading} />
 					</Tooltip>
 				)}
 				{ticket.status === "pending" && ticket.queue !== null && (
 					<Tooltip title={i18n.t("ticketsList.items.accept")}>
 						<DoneIcon
 							style={{
-								color: 'green',
 								bottom: '-20px',
-								borderRadius: "15px",
-								left: '8px',
+								marginRight: '4px',
 								fontSize: "22px"
 							}}
 							className={classes.bottomButton}
-							onClick={e => handleAcepptTicket(ticket.id)}
-						/>
+							color="primary"
+							onClick={e => handleAcepptTicket(ticket.id)} />
 					</Tooltip>
 				)}
 				{/* {ticket.status === "pending" && (
@@ -530,56 +508,45 @@ const TicketListItem = ({ ticket }) => {
 							className={classes.bottomButton}
 							color="primary"
 							onClick={e => handleClosedTicket(ticket.id)} >
-							<ClearOutlinedIcon />
+							<CancelIcon />
 						</IconButton>
 					</Tooltip>
 				)} */}
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.return")}>
 						<UndoRoundedIcon
-							className={classes.bottomButton}
 							style={{
-								color: 'black',
-								marginRight: "5px",
 								bottom: '-20px',
-								borderRadius: '15px',
-								left: '8px',
-								fontSize: "18px"
+								marginRight: '4px',
+								fontSize: "22px"
 							}}
-							onClick={e => handleViewTicket(ticket.id)}
-						/>
+							className={classes.bottomButton}
+							color="primary"
+							onClick={e => handleViewTicket(ticket.id)} />
 					</Tooltip>
 				)}
 				{ticket.status === "open" && (
 					<Tooltip title={i18n.t("ticketsList.items.close")}>
 						<CancelIcon
 							style={{
-								color: '#cf0e00',
 								bottom: '-20px',
-								borderRadius: "15px",
-								left: '8px',
+								marginRight: '4px',
 								fontSize: "22px"
 							}}
 							className={classes.bottomButton}
 							color="primary"
-							onClick={e => handleClosedTicket(ticket.id)}
-						/>
+							onClick={e => handleClosedTicket(ticket.id)} />
 					</Tooltip>
 				)}
 				{ticket.status === "closed" && (
-					<Tooltip title={i18n.t("ticketsList.items.reopen")}>
-						<ReplayIcon
-							style={{
-								color: 'green',
-								bottom: '-20px',
-								borderRadius: "15px",
-								left: '8px',
-								fontSize: "22px"
-							}}
-							className={classes.bottomButton}
-							onClick={e => handleReopenTicket(ticket.id)}
-						/>
-					</Tooltip>
+					<UndoRoundedIcon
+						style={{
+							bottom: '-16px',
+							fontSize: "22px"
+						}}
+						className={classes.bottomButton}
+						color="primary"
+						onClick={e => handleReopenTicket(ticket.id)} />
 				)}
 			</ListItem>
 			<Divider variant="middle" component="li" />
