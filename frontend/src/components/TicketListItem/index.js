@@ -437,6 +437,7 @@ const TicketListItem = ({ ticket }) => {
 															backgroundColor: "#000",
 															height: 20,
 															padding: 3,
+															marginTop: 2,
 															marginRight: 5,
 															position: "inherit",
 															borderRadius: 4,

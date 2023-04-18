@@ -11,6 +11,7 @@ import clsx from "clsx";
 
 import { blue, red } from "@material-ui/core/colors";
 import {
+  Chip,
   Button,
   CircularProgress,
   Divider,
@@ -48,8 +49,16 @@ const useStyles = makeStyles((theme) => ({
   },
 
   ticketNumber: {
-    color: theme.palette.secondary.main,
-    padding: 8,
+    color: system.color.lightTheme.menuItens,
+    backgroundColor: theme.palette.primary.main,
+    width: "65%",
+    padding: 2,
+    marginTop: 20,
+    marginBottom: 20,
+    alignSelf: "center",
+    fontWeight: 'bold',
+    border: "2px solid rgba(255,255,255,0.8)",
+    /* boxShadow: "0px 5px 0px #FFF", */
   },
 
   messagesList: {
@@ -306,17 +315,6 @@ const useStyles = makeStyles((theme) => ({
     margin: "10px",
     borderRadius: "10px",
     boxShadow: "1px 5px 10px #b3b3b3",
-  },
-
-
-
-
-  currentTicktText: {
-    color: system.color.lightTheme.palette.secondary,
-    fontWeight: 'bold',
-    padding: 8,
-    alignSelf: "center",
-    marginLeft: "0px",
   },
 
 }));
@@ -624,31 +622,22 @@ const MessagesList = ({ ticketId, isGroup }) => {
   };
 
   const renderTicketsSeparator = (message, index) => {
-    let lastTicket = messagesList[index - 1]?.ticketId;
-    let currentTicket = message.ticketId;
+    if (index < messagesList.length && index > 0) {
+      let messageTicket = message.ticketId;
+      let previousMessageTicket = messagesList[index - 1].ticketId;
 
-    if (lastTicket !== currentTicket && lastTicket !== undefined) {
-      return (
+      if (messageTicket !== previousMessageTicket) {
+        return (
+          <Chip
+            label={"Início do Chamado Nº " + messageTicket}
+            key={`ticket-${message.id}`}
+            className={classes.ticketNumber}
+          />
 
-
-        <span
-
-          className={classes.currentTick}
-          key={`timestamp-${message.id}`}
-        >
-          <div
-
-            className={classes.currentTicktText}
-          >
-            #Chamado {message.ticketId}
-          </div>
-
-        </span>
-
-      );
+        );
+      }
     }
-  }
-
+  };
 
   const renderMessageDivider = (message, index) => {
     if (index < messagesList.length && index > 0) {
