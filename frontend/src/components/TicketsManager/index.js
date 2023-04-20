@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import { 
+import {
   Badge,
-  Button,
+  Fab,
   FormControlLabel,
   makeStyles,
   Paper,
@@ -17,6 +17,7 @@ import {
   MoveToInbox,
   Search
 } from "@material-ui/icons";
+import WhatsAppIcon from "@material-ui/icons/WhatsApp";
 
 import NewTicketModal from "../NewTicketModal";
 import TicketsList from "../TicketsList";
@@ -57,10 +58,13 @@ const useStyles = makeStyles((theme) => ({
 
   ticketOptionsBox: {
     display: "flex",
+    height: "20px",
+    marginTop: "20px",
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(1),
+    zIndex: 1,
   },
 
   serachInputWrapper: {
@@ -100,6 +104,14 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     padding: "10px",
     borderBottom: "2px solid rgba(0, 0, 0, .12)",
+  },
+  whatsappIcon: {
+    height: "40px",
+    width: "40px",
+    position: "absolute",
+    bottom: "15px",
+    left: "15px",
+    zIndex: 999,
   },
 }));
 
@@ -219,13 +231,14 @@ const TicketsManager = () => {
         </Tabs>
       </Paper>
       <Paper square elevation={0} className={classes.ticketOptionsBox}>
-        <Button
-          variant="outlined"
-          color="primary"
+        <Fab
           onClick={() => setNewTicketModalOpen(true)}
+          color="primary"
+          aria-label="add"
+          className={classes.whatsappIcon}
         >
-          {i18n.t("ticketsManager.buttons.newTicket")}
-        </Button>
+          <WhatsAppIcon />
+        </Fab>
         <Can
           role={user.profile}
           perform="tickets-manager:showall"
@@ -255,7 +268,7 @@ const TicketsManager = () => {
         />
       </Paper>
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
-      <TagsFilter onFiltered={handleSelectedTags} />
+        <TagsFilter onFiltered={handleSelectedTags} />
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
             status="open"
@@ -274,7 +287,7 @@ const TicketsManager = () => {
       </TabPanel>
 
       <TabPanel value={tab} name="pending" className={classes.ticketsWrapper}>
-      <TagsFilter onFiltered={handleSelectedTags} />
+        <TagsFilter onFiltered={handleSelectedTags} />
         <TicketsList
           status="pending"
           showAll={true}
@@ -286,7 +299,7 @@ const TicketsManager = () => {
 
 
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
-      <TagsFilter onFiltered={handleSelectedTags} />
+        <TagsFilter onFiltered={handleSelectedTags} />
         <TicketsList
           status="closed"
           showAll={true}
@@ -294,7 +307,7 @@ const TicketsManager = () => {
         />
       </TabPanel>
       <TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
-      <TagsFilter onFiltered={handleSelectedTags} />
+        <TagsFilter onFiltered={handleSelectedTags} />
         <TicketsList
           searchParam={searchParam}
           tags={selectedTags}
