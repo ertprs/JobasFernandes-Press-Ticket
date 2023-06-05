@@ -124,6 +124,9 @@ const messages = {
           display: "Mostrar hora del sector",
           farewellMessage: "Mensaje de despedida",
           ratingMessage: "Mensaje de evaluación",
+          sendInactiveMessage: "Apagado automático",
+          timeInactiveMessage: "Hora de finalizar la respuesta automática",
+          inactiveMessage: "Mensaje de apagado automático",
           instructionRatingMessage: "Para habilitar las evaluaciones, simplemente complete este campo",
           outOfWorkMessage: "Personaliza el mensaje cuando estés fuera del horario de oficina",
           startWorkHour: "Abierto",
@@ -297,9 +300,34 @@ const messages = {
           asistente: "Asistente",
           startWork: "Inicio",
           endWork: "Finalizar",
+
           allHistoric: "Ver Historiales",
           allHistoricEnabled: "Activado",
-          allHistoricDesabled: "Desactivado"
+          allHistoricDesabled: "Desactivado",
+
+          isRemoveTags: "Eliminar etiquetas",
+          isRemoveTagsEnabled: "Activado",
+          isRemoveTagsDesabled: "Desactivado",
+
+          viewConection: "Ver conexiones",
+          viewConectionEnabled: "Activado",
+          viewConectionDesabled: "Desactivado",
+
+          viewSector: "Ver sectores",
+          viewSectorEnabled: "Activado",
+          viewSectorDesabled: "Desactivado",
+
+          viewName: "Ver nombre",
+          viewNameEnabled: "Activado",
+          viewNameDesabled: "Desactivado",
+
+          viewTags: "Ver etiquetas",
+          viewTagsEnabled: "Activado",
+          viewTagsDesabled: "Desactivado",
+
+          allTicket: "Ver entradas sin sector",
+          allTicketEnabled: "Activado",
+          allTicketDesabled: "Desactivado",
         },
         buttons: {
           okAdd: "Agregar",
@@ -544,14 +572,6 @@ const messages = {
               disabled: "Deshabilitado",
             },
           },
-          allHistoric: {
-            name: "Todos pueden ver el historial de mensajes del cliente.",
-            note: "Activa esta función para que todos los usuarios vean el historial del cliente, si está desactivada solo es posible ver dentro de los sectores.",
-            options: {
-              enabled: "Habilitado",
-              disabled: "Deshabilitado",
-            },
-          },
           CheckMsgIsGroup: {
             name: "Ignorar mensajes de grupo",
             note: "Si lo desactivas, recibirás mensajes de grupos.",
@@ -693,7 +713,7 @@ const messages = {
         ERR_INVALID_CREDENTIALS: "Error de autenticación. Vuelva a intentarlo",
         ERR_SENDING_WAPP_MSG: "Error al enviar el mensaje de WhatsApp. Verificar página de conexiones.",
         ERR_DELETE_WAPP_MSG: "No se pudo eliminar el mensaje de WhatsApp.",
-        ERR_OTHER_OPEN_TICKET: "Ya hay una convocatoria abierta para este contacto con ",
+        ERR_OTHER_OPEN_TICKET: "Ya hay un ticket abierto para este contacto.",
         ERR_SESSION_EXPIRED: "Sesión caducada. Inicie sesión.",
         ERR_USER_CREATION_DISABLED: "La creación de asistentes ha sido deshabilitada por el administrador.",
         ERR_NO_PERMISSION: "No tienes permiso para acceder a este recurso.",

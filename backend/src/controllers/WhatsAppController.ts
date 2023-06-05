@@ -19,6 +19,56 @@ interface WhatsappData {
   status?: string;
   isDefault?: boolean;
   isGroup?: boolean;
+  sendInactiveMessage?: boolean;
+  inactiveMessage?: string;
+  timeInactiveMessage?: string;
+
+  //Difinindo horario comercial
+  defineWorkHours?: boolean;
+  outOfWorkMessage?: string;
+  //Dias da semana.
+  monday?: boolean;
+  tuesday?: boolean;
+  wednesday?: boolean;
+  thursday?: boolean;
+  friday?: boolean;
+  saturday?: boolean;
+  sunday?: boolean;
+  // horario de cada dia da semana.
+  StartDefineWorkHoursMonday?: string;
+  EndDefineWorkHoursMonday?: string;
+  StartDefineWorkHoursMondayLunch?: string;
+  EndDefineWorkHoursMondayLunch?: string;
+
+  StartDefineWorkHoursTuesday?: string;
+  EndDefineWorkHoursTuesday?: string;
+  StartDefineWorkHoursTuesdayLunch?: string;
+  EndDefineWorkHoursTuesdayLunch?: string;
+
+  StartDefineWorkHoursWednesday?: string;
+  EndDefineWorkHoursWednesday?: string;
+  StartDefineWorkHoursWednesdayLunch?: string;
+  EndDefineWorkHoursWednesdayLunch?: string;
+
+  StartDefineWorkHoursThursday?: string;
+  EndDefineWorkHoursThursday?: string;
+  StartDefineWorkHoursThursdayLunch?: string;
+  EndDefineWorkHoursThursdayLunch?: string;
+
+  StartDefineWorkHoursFriday?: string;
+  EndDefineWorkHoursFriday?: string;
+  StartDefineWorkHoursFridayLunch?: string;
+  EndDefineWorkHoursFridayLunch?: string;
+
+  StartDefineWorkHoursSaturday?: string;
+  EndDefineWorkHoursSaturday?: string;
+  StartDefineWorkHoursSaturdayLunch?: string;
+  EndDefineWorkHoursSaturdayLunch?: string;
+
+  StartDefineWorkHoursSunday?: string;
+  EndDefineWorkHoursSunday?: string;
+  StartDefineWorkHoursSundayLunch?: string;
+  EndDefineWorkHoursSundayLunch?: string;
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -29,8 +79,8 @@ export const index = async (req: Request, res: Response): Promise<Response> => {
 
 export const store = async (req: Request, res: Response): Promise<Response> => {
 
-const WhatsApps = await ListWhatsAppsService();
-  
+  const WhatsApps = await ListWhatsAppsService();
+
   if (WhatsApps.length >= Number(process.env.CONNECTIONS_LIMIT)) {
     throw new AppError("ERR_CONNECTION_CREATION_COUNT", 403);
   }
@@ -42,7 +92,56 @@ const WhatsApps = await ListWhatsAppsService();
     greetingMessage,
     farewellMessage,
     queueIds,
-    isGroup
+    isGroup,
+    sendInactiveMessage,
+    inactiveMessage,
+    timeInactiveMessage,
+
+    defineWorkHours,
+    outOfWorkMessage,
+
+    monday,
+    tuesday,
+    wednesday,
+    thursday,
+    friday,
+    saturday,
+    sunday,
+
+    StartDefineWorkHoursMonday,
+    EndDefineWorkHoursMonday,
+    StartDefineWorkHoursMondayLunch,
+    EndDefineWorkHoursMondayLunch,
+
+    StartDefineWorkHoursTuesday,
+    EndDefineWorkHoursTuesday,
+    StartDefineWorkHoursTuesdayLunch,
+    EndDefineWorkHoursTuesdayLunch,
+
+    StartDefineWorkHoursWednesday,
+    EndDefineWorkHoursWednesday,
+    StartDefineWorkHoursWednesdayLunch,
+    EndDefineWorkHoursWednesdayLunch,
+
+    StartDefineWorkHoursThursday,
+    EndDefineWorkHoursThursday,
+    StartDefineWorkHoursThursdayLunch,
+    EndDefineWorkHoursThursdayLunch,
+
+    StartDefineWorkHoursFriday,
+    EndDefineWorkHoursFriday,
+    StartDefineWorkHoursFridayLunch,
+    EndDefineWorkHoursFridayLunch,
+
+    StartDefineWorkHoursSaturday,
+    EndDefineWorkHoursSaturday,
+    StartDefineWorkHoursSaturdayLunch,
+    EndDefineWorkHoursSaturdayLunch,
+
+    StartDefineWorkHoursSunday,
+    EndDefineWorkHoursSunday,
+    StartDefineWorkHoursSundayLunch,
+    EndDefineWorkHoursSundayLunch,
   }: WhatsappData = req.body;
 
   const { whatsapp, oldDefaultWhatsapp } = await CreateWhatsAppService({
@@ -52,7 +151,56 @@ const WhatsApps = await ListWhatsAppsService();
     greetingMessage,
     farewellMessage,
     queueIds,
-    isGroup
+    isGroup,
+    sendInactiveMessage,
+    inactiveMessage,
+    timeInactiveMessage,
+
+    defineWorkHours,
+    outOfWorkMessage,
+
+    monday,
+    tuesday,
+    wednesday,
+    thursday,
+    friday,
+    saturday,
+    sunday,
+
+    StartDefineWorkHoursMonday,
+    EndDefineWorkHoursMonday,
+    StartDefineWorkHoursMondayLunch,
+    EndDefineWorkHoursMondayLunch,
+
+    StartDefineWorkHoursTuesday,
+    EndDefineWorkHoursTuesday,
+    StartDefineWorkHoursTuesdayLunch,
+    EndDefineWorkHoursTuesdayLunch,
+
+    StartDefineWorkHoursWednesday,
+    EndDefineWorkHoursWednesday,
+    StartDefineWorkHoursWednesdayLunch,
+    EndDefineWorkHoursWednesdayLunch,
+
+    StartDefineWorkHoursThursday,
+    EndDefineWorkHoursThursday,
+    StartDefineWorkHoursThursdayLunch,
+    EndDefineWorkHoursThursdayLunch,
+
+    StartDefineWorkHoursFriday,
+    EndDefineWorkHoursFriday,
+    StartDefineWorkHoursFridayLunch,
+    EndDefineWorkHoursFridayLunch,
+
+    StartDefineWorkHoursSaturday,
+    EndDefineWorkHoursSaturday,
+    StartDefineWorkHoursSaturdayLunch,
+    EndDefineWorkHoursSaturdayLunch,
+
+    StartDefineWorkHoursSunday,
+    EndDefineWorkHoursSunday,
+    StartDefineWorkHoursSundayLunch,
+    EndDefineWorkHoursSundayLunch,
   });
 
   StartWhatsAppSession(whatsapp);

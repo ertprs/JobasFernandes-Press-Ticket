@@ -126,6 +126,9 @@ const messages = {
           group: "Permitir mensagens de grupos",
           farewellMessage: "Mensagem de despedida",
           ratingMessage: "Mensagem de avaliação",
+          sendInactiveMessage: "Encerramento automático",
+          timeInactiveMessage: "Tempo para encerrar atendimento automático",
+          inactiveMessage: "Mensagem de encerramento automático",
           instructionRatingMessage: "Para habilitar as avaliações, basta preencher este campo",
           outOfWorkMessage: "Personalize a mensagem quando estiver fora do horário de expediente",
           startWorkHour: "Abertura",
@@ -301,7 +304,31 @@ const messages = {
           endWork: "Termino",
           allHistoric: "Ver históricos",
           allHistoricEnabled: "Habilitado",
-          allHistoricDesabled: "Desabilitado"
+          allHistoricDesabled: "Desabilitado",
+
+          isRemoveTags: "Remover tags",
+          isRemoveTagsEnabled: "Habilitado",
+          isRemoveTagsDesabled: "Desabilitado",
+
+          viewConection: "Ver conexões",
+          viewConectionEnabled: "Habilitado",
+          viewConectionDesabled: "Desabilitado",
+
+          viewSector: "Ver setores",
+          viewSectorEnabled: "Habilitado",
+          viewSectorDesabled: "Desabilitado",
+
+          viewName: "Ver nome",
+          viewNameEnabled: "Habilitado",
+          viewNameDesabled: "Desabilitado",
+
+          viewTags: "Ver tags",
+          viewTagsEnabled: "Habilitado",
+          viewTagsDesabled: "Desabilitado",
+
+          allTicket: "Ver chamados sem setor",
+          allTicketEnabled: "Habilitado",
+          allTicketDesabled: "Desabilitado",
         },
         buttons: {
           okAdd: "Adicionar",
@@ -539,22 +566,6 @@ const messages = {
               disabled: "Desativado",
             },
           },
-          allTicket: {
-            name: "Todos podem ver o chamado sem departamento",
-            note: "Ative essa função para deixar todos os usuarios verem os chamados sem setor",
-            options: {
-              enabled: "Ativado",
-              disabled: "Desativado",
-            },
-          },
-          allHistoric: {
-            name: "Todos podem ver o histórico de mensagem do cliente",
-            note: "Ative essa função para deixar todos os usuarios verem o histórico do cliente, caso desative só é possivel ver dentro dos setores.",
-            options: {
-              enabled: "Ativado",
-              disabled: "Desativado",
-            },
-          },
           CheckMsgIsGroup: {
             name: "Ignorar Mensagens de Grupos",
             note: "Se desabilitar, irá receber mensage dos grupos.",
@@ -597,7 +608,7 @@ const messages = {
           },
           ASC: {
             name: "Ordenação dos chamados (Crescente ou Decrescente)",
-            note: "Ao ativar irá ordenar ascendente (ASC), desativando ordenará decrescente (DESC)",
+            note: "Ao ativar irá ordenar de forma crescente, desativando ordenará de forma decrescente",
             options: {
               enabled: "Ativado",
               disabled: "Desativado",
@@ -659,7 +670,7 @@ const messages = {
           assignedTo: "Responsável:",
           buttons: {
             back: "Voltar",
-            return: "Retornar",
+            return: "Mover para aguardando",
             resolve: "Resolver",
             reopen: "Reabrir",
             accept: "Aceitar",
@@ -721,7 +732,7 @@ const messages = {
         ERR_INVALID_CREDENTIALS: "Erro de autenticação. Por favor, tente novamente.",
         ERR_SENDING_WAPP_MSG: "Erro ao enviar mensagem do WhatsApp. Verifique a página de conexões.",
         ERR_DELETE_WAPP_MSG: "Não foi possível excluir a mensagem do WhatsApp.",
-        ERR_OTHER_OPEN_TICKET: "Já existe um chamado aberto para este contato com ",
+        ERR_OTHER_OPEN_TICKET: "Já existe um chamado aberto para este contato.",
         ERR_SESSION_EXPIRED: "Sessão expirada. Por favor entre.",
         ERR_USER_CREATION_DISABLED: "A criação do atendente foi desabilitada pelo administrador.",
         ERR_NO_PERMISSION: "Você não tem permissão para acessar este recurso.",

@@ -159,13 +159,13 @@ const TicketListItem = ({ ticket }) => {
 				clearTimeout(delayDebounceFn);
 			}
 		};
-	}, [ticketId, user, history, ticket.id]);
+	}, [ticketId, user, history]);
 
 	useEffect(() => {
 		return () => {
 			isMounted.current = false;
 		};
-	}, [ticket.id]);
+	}, []);
 
 	const ContactTag = ({ tag }) => {
 
@@ -278,7 +278,7 @@ const TicketListItem = ({ ticket }) => {
 	// Nome do atendente
 	const [uName, setUserName] = useState(null);
 
-	if (ticket.status === "pending") {
+	if (ticket.status === "pending" || ticket.status === "closed") {
 
 	} else {
 
@@ -293,6 +293,10 @@ const TicketListItem = ({ ticket }) => {
 		};
 		fetchUserName();
 	};
+
+	const viewConection = user.viewConection === 'enabled';
+	const viewName = user.viewName === 'enabled';
+	const viewTags = user.viewTags === 'enabled';
 
 	return (
 		<React.Fragment key={ticket.id}>
@@ -405,63 +409,79 @@ const TicketListItem = ({ ticket }) => {
 								}} />
 						</span>
 							<span className={classes.Radiusdot}>
-								{ticket.whatsappId && (
-									<Tooltip title={i18n.t("messageVariablesPicker.vars.connection")}>
-										<Badge
-											className={classes.Radiusdot}
-											style={{
-												backgroundColor: system.color.lightTheme.palette.primary,
-												height: 20,
-												padding: 3,
-												marginTop: 2,
-												marginRight: 5,
-												position: "inherit",
-												borderRadius: 4,
-												border: "2px solid #CCC",
-												color: "white"
-											}}
-											badgeContent={ticket.whatsapp?.name || i18n.t("userModal.form.user")}
-										/>
-									</Tooltip>
-								)}
-								<Can
-									role={user.profile}
-									perform="drawer-admin-items:view"
-									yes={() => (
-										<>
-											{uName && uName !== "" && (
-												<Tooltip title={i18n.t("messageVariablesPicker.vars.user")}>
-													<Badge
-														className={classes.Radiusdot}
-														style={{
-															backgroundColor: "#000",
-															height: 20,
-															padding: 3,
-															marginTop: 2,
-															marginRight: 5,
-															position: "inherit",
-															borderRadius: 4,
-															border: "2px solid #CCC",
-															color: "white",
-														}}
-														badgeContent={uName}
-													/>
-												</Tooltip>
-											)}
-										</>
-									)}
-								/>
-								<Tooltip title={"Tags"}>
-									<span className={classes.Radiusdot}>
-										{
-											tag?.map((tag) => {
-												return (
-													<ContactTag tag={tag} key={`ticket-contact-tag-${ticket.id}-${tag.id}`} />
-												);
-											})
-										}
+								{viewConection ? (
+									<>
+										{ticket.whatsappId && (
+											<Tooltip title={i18n.t("messageVariablesPicker.vars.connection")}>
+												<Badge
+													className={classes.Radiusdot}
+													style={{
+														backgroundColor: system.color.lightTheme.palette.primary,
+														height: 20,
+														padding: 3,
+														marginTop: 2,
+														marginRight: 5,
+														position: "inherit",
+														borderRadius: 4,
+														border: "2px solid #CCC",
+														color: "white"
+
+													}}
+													badgeContent={ticket.whatsapp?.name || i18n.t("userModal.form.user")}
+
+												/>
+
+											</Tooltip>
+										)}
+									</>
+								) : null}
+
+								{viewName ? (
+									<Can
+										role={user.profile}
+										perform="drawer-admin-items:view"
+										yes={() => (
+											<>
+												{uName && uName !== "" && (
+													<Tooltip title={i18n.t("messageVariablesPicker.vars.user")}>
+														<Badge
+															className={classes.Radiusdot}
+															style={{
+																backgroundColor: "#000",
+																height: 20,
+																padding: 3,
+																marginRight: 5,
+																marginTop: 2,
+																position: "inherit",
+																borderRadius: 4,
+																border: "2px solid #CCC",
+																color: "white",
+															}}
+															badgeContent={uName}
+														/>
+													</Tooltip>
+												)}
+											</>
+										)}
+									/>
+
+								) : null}
+
+								{viewTags ? (
+									<span>
+										<Tooltip title={"Tags"}>
+											<span className={classes.Radiusdot}>
+												{
+													tag?.map((tag) => {
+														return (
+															<ContactTag tag={tag} key={`ticket-contact-tag-${ticket.id}-${tag.id}`} />
+														);
+													})
+												}
+											</span>
+										</Tooltip>
 									</span>
-								</Tooltip>
+								) : null}
 							</span>
 						</>
 					}

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 
-import {
+import { 
   Badge,
   Fab,
   FormControlLabel,
@@ -268,7 +268,7 @@ const TicketsManager = () => {
         />
       </Paper>
       <TabPanel value={tab} name="open" className={classes.ticketsWrapper}>
-        <TagsFilter onFiltered={handleSelectedTags} />
+      <TagsFilter onFiltered={handleSelectedTags} />
         <Paper className={classes.ticketsWrapper}>
           <TicketsList
             status="open"
@@ -287,7 +287,7 @@ const TicketsManager = () => {
       </TabPanel>
 
       <TabPanel value={tab} name="pending" className={classes.ticketsWrapper}>
-        <TagsFilter onFiltered={handleSelectedTags} />
+      <TagsFilter onFiltered={handleSelectedTags} />
         <TicketsList
           status="pending"
           showAll={true}
@@ -299,7 +299,7 @@ const TicketsManager = () => {
 
 
       <TabPanel value={tab} name="closed" className={classes.ticketsWrapper}>
-        <TagsFilter onFiltered={handleSelectedTags} />
+      <TagsFilter onFiltered={handleSelectedTags} />
         <TicketsList
           status="closed"
           showAll={true}
@@ -307,7 +307,7 @@ const TicketsManager = () => {
         />
       </TabPanel>
       <TabPanel value={tab} name="search" className={classes.ticketsWrapper}>
-        <TagsFilter onFiltered={handleSelectedTags} />
+      <TagsFilter onFiltered={handleSelectedTags} />
         <TicketsList
           searchParam={searchParam}
           tags={selectedTags}

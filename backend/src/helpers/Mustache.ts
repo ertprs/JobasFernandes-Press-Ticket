@@ -10,10 +10,10 @@ export const msgsd = (): string => {
 
   const hh = new Date().getHours();
 
-  if (hh >= 6) { ms = "Bom Dia"; }
-  if (hh > 11) { ms = "Boa Tarde"; }
-  if (hh > 17) { ms = "Boa Noite"; }
-  if (hh > 23 || hh < 6) { ms = "Boa Madrugada"; }
+  if (hh >= 6) { ms = "Bom dia"; }
+  if (hh > 11) { ms = "Boa tarde"; }
+  if (hh > 17) { ms = "Boa noite"; }
+  if (hh > 23 || hh < 6) { ms = "Boa madrugada"; }
 
   return ms;
 };
@@ -75,6 +75,5 @@ export default (body: string, ticket?: Ticket): string => {
       ticket ? ticket.id.toString() : ""
     ).join(""),
   };
-
   return Mustache.render(body, view);
 };

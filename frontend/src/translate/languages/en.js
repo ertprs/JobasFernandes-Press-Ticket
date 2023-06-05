@@ -125,6 +125,9 @@ const messages = {
           group: "Permit group messages",
           farewellMessage: "Farewell Message",
           ratingMessage: "Evaluation Message",
+          sendInactiveMessage: "Automatic shutdown",
+          timeInactiveMessage: "Time to end auto answer",
+          inactiveMessage: "Auto shutdown message",
           instructionRatingMessage: "To enable assessments, simply fill in this field",
           outOfWorkMessage: "Customize the message when you are out of office hours",
           startWorkHour: "Open",
@@ -223,7 +226,7 @@ const messages = {
       tags: {
         title: "Tags",
         table: {
-          id: "ID",
+          id:"ID",
           name: "Tags",
           color: "Color",
           contacts: "Contacts",
@@ -300,7 +303,31 @@ const messages = {
           endWork: "Finish",
           allHistoric: "View Histories",
           allHistoricEnabled: "Enabled",
-          allHistoricDesabled: "Disabled"
+          allHistoricDesabled: "Disabled",
+
+          isRemoveTags: "Remove tags",
+          isRemoveTagsEnabled: "Habilitado",
+          isRemoveTagsDesabled: "Disabled",
+
+          viewConection: "See connections",
+          viewConectionEnabled: "Enabled",
+          viewConectionDesabled: "Disabled",
+
+          viewSector: "See queue",
+          viewSectorEnabled: "Enabled",
+          viewSectorDesabled: "Disabled",
+
+          viewName: "See name",
+          viewNameEnabled: "Enabled",
+          viewNameDesabled: "Disabled",
+
+          viewTags: "See tags",
+          viewTagsEnabled: "Enabled",
+          viewTagsDesabled: "Disabled",
+         
+          allTicket: "See tickets without queue",
+          allTicketEnabled: "Enabled",
+          allTicketDesabled: "Disabled",
         },
         buttons: {
           okAdd: "Add",
@@ -414,7 +441,7 @@ const messages = {
         appBar: {
           message: {
             hi: "Hello",
-            text: "welcome"
+            text: "welcome to the System"
           },
           user: {
             profile: "Profile",
@@ -443,7 +470,7 @@ const messages = {
             userId: "User ID",
             whatsappId: "WhatsApp ID",
             body: "Here goes your text",
-            medias: "Here goes your media",
+            medias : "Here goes your media",
             fullNumber: "14089999999"
           },
           exempleText: "Below is a list of information needed to send text messages:",
@@ -540,14 +567,6 @@ const messages = {
           allTicket: {
             name: "Everyone can see the ticket without department.",
             note: "Activate this function to let all users see tickets without sector",
-            options: {
-              enabled: "Enabled",
-              disabled: "Disabled",
-            },
-          },
-          allHistoric: {
-            name: "Everyone can see the customer's message history.",
-            note: "Activate this function to let all users see the client's history, if deactivated it is only possible to see within the sectors.",
             options: {
               enabled: "Enabled",
               disabled: "Disabled",
@@ -697,7 +716,7 @@ const messages = {
         ERR_INVALID_CREDENTIALS: "Authentication error. Please try again.",
         ERR_SENDING_WAPP_MSG: "Error sending WhatsApp message. Check connections page.",
         ERR_DELETE_WAPP_MSG: "Unable to delete WhatsApp message.",
-        ERR_OTHER_OPEN_TICKET: "There is already an open call for this contact with ",
+        ERR_OTHER_OPEN_TICKET: "There is already an open ticket for this contact.",
         ERR_SESSION_EXPIRED: "Session expired. Please sign in.",
         ERR_USER_CREATION_DISABLED: "Creation of the attendant has been disabled by the administrator.",
         ERR_NO_PERMISSION: "You do not have permission to access this resource.",

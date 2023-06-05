@@ -1,5 +1,10 @@
-
-import React, { useState, useEffect, useReducer, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useReducer,
+  useContext,
+  useRef
+} from "react";
 
 import {
   isSameDay,
@@ -10,6 +15,7 @@ import openSocket from "../../services/socket-io";
 import clsx from "clsx";
 
 import { blue, red } from "@material-ui/core/colors";
+// import { AuthContext } from "../../context/Auth/AuthContext";
 import {
   Chip,
   Button,
@@ -27,11 +33,14 @@ import {
   GetApp,
 } from "@material-ui/icons";
 
+import { ReplyMessageContext } from "../../context/ReplyingMessage/ReplyingMessageContext";
+
 import MarkdownWrapper from "../MarkdownWrapper";
 import VcardPreview from "../VcardPreview";
 import LocationPreview from "../LocationPreview";
 import ModalImageCors from "../ModalImageCors";
 import MessageOptionsMenu from "../MessageOptionsMenu";
+
 import Audio from "../Audio";
 
 import api from "../../services/api";
@@ -385,11 +394,15 @@ const MessagesList = ({ ticketId, isGroup }) => {
   const [hasMore, setHasMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const lastMessageRef = useRef();
+  // const { user } = useContext(AuthContext);
 
   const [selectedMessage, setSelectedMessage] = useState({});
+
   const [anchorEl, setAnchorEl] = useState(null);
   const messageOptionsMenuOpen = Boolean(anchorEl);
   const currentTicketId = useRef(ticketId);
+
+  const { setReplyingMessage } = useContext(ReplyMessageContext);
 
   useEffect(() => {
     dispatch({ type: "RESET" });
@@ -476,9 +489,16 @@ const MessagesList = ({ ticketId, isGroup }) => {
     }
   };
 
+
+
   const handleOpenMessageOptionsMenu = (e, message) => {
     setAnchorEl(e.currentTarget);
     setSelectedMessage(message);
+  };
+
+  const hanldeReplyMessage = (e, message) => {
+    setAnchorEl(null);
+    setReplyingMessage(message);
   };
 
   const handleCloseMessageOptionsMenu = (e) => {
@@ -622,22 +642,18 @@ const MessagesList = ({ ticketId, isGroup }) => {
   };
 
   const renderTicketsSeparator = (message, index) => {
-    if (index < messagesList.length && index > 0) {
-      let messageTicket = message.ticketId;
-      let previousMessageTicket = messagesList[index - 1].ticketId;
-
-      if (messageTicket !== previousMessageTicket) {
-        return (
-          <Chip
-            label={"Início do Chamado Nº " + messageTicket}
-            key={`ticket-${message.id}`}
-            className={classes.ticketNumber}
-          />
-
-        );
-      }
+    let lastTicket = messagesList[index - 1]?.ticketId;
+    let currentTicket = message.ticketId;
+    if (lastTicket !== currentTicket && lastTicket !== undefined) {
+      return (
+        <Chip
+          label={"Início do Chamado Nº " + message.ticketId}
+          key={`timestamp-${message.id}`}
+          className={classes.ticketNumber}
+        />
+      );
     }
-  };
+  }
 
   const renderMessageDivider = (message, index) => {
     if (index < messagesList.length && index > 0) {
@@ -646,7 +662,7 @@ const MessagesList = ({ ticketId, isGroup }) => {
 
       if (messageUser !== previousMessageUser) {
         return (
-          <span style={{ marginTop: 16 }} key={`divider-${message.id}`}></span>
+          <span style={{ marginTop: 16 }} key={`divider-${message.id}`} ></span>
         );
       }
     }
@@ -723,7 +739,10 @@ const MessagesList = ({ ticketId, isGroup }) => {
               {renderMessageDivider(message, index)}
               {/* {renderNumberTicket(message, index)} */}
               {renderTicketsSeparator(message, index)}
-              <div className={classes.messageCenter}>
+
+              <div className={classes.messageCenter}
+                onDoubleClick={(e) => hanldeReplyMessage(e, message)}>
+
                 <IconButton
                   variant="contained"
                   size="small"
@@ -755,7 +774,10 @@ const MessagesList = ({ ticketId, isGroup }) => {
               {renderMessageDivider(message, index)}
               {/* {renderNumberTicket(message, index)} */}
               {renderTicketsSeparator(message, index)}
-              <div className={classes.messageLeft}>
+              <div className={classes.messageLeft}
+
+                onDoubleClick={(e) => hanldeReplyMessage(e, message)}>
+
                 <IconButton
                   variant="contained"
                   size="small"
@@ -805,7 +827,10 @@ const MessagesList = ({ ticketId, isGroup }) => {
               {renderMessageDivider(message, index)}
               {renderTicketsSeparator(message, index)}
               {/* {renderNumberTicket(message, index)} */}
-              <div className={classes.messageRight}>
+              <div className={classes.messageRight}
+
+                onDoubleClick={(e) => hanldeReplyMessage(e, message)}>
+
                 <IconButton
                   variant="contained"
                   size="small"
@@ -848,9 +873,9 @@ const MessagesList = ({ ticketId, isGroup }) => {
       return <div>Say hello to your new contact!</div>;
     }
   };
-
   return (
-    <div className={classes.messagesListWrapper}>
+    <div className={classes.messagesListWrapper}
+    >
       <MessageOptionsMenu
         message={selectedMessage}
         anchorEl={anchorEl}

@@ -198,16 +198,15 @@ const Settings = () => {
 							</Paper>
 
 							<Typography variant="body2" gutterBottom></Typography>
-
 							<Paper className={classes.paper}>
-								<Tooltip title={i18n.t("settings.settings.allTicket.note")}>
+								<Tooltip title={i18n.t("settings.settings.closeTicketApi.note")}>
 									<FormControlLabel
 										control={
 											<IOSSwitch
-												checked={settings && settings.length > 0 && getSettingValue("allTicket") === "enabled"}
-												onChange={handleChangeBooleanSetting} name="allTicket"
+												checked={settings && settings.length > 0 && getSettingValue("closeTicketApi") === "enabled"}
+												onChange={handleChangeBooleanSetting} name="closeTicketApi"
 											/>}
-										label={i18n.t("settings.settings.allTicket.name")}
+										label={i18n.t("settings.settings.closeTicketApi.name")}
 									/>
 								</Tooltip>
 							</Paper>
@@ -260,19 +259,7 @@ const Settings = () => {
 					<div style={{ width: '50%', paddingLeft: '10px' }}>
 						<Container className={classes.container} maxWidth="xs">
 
-							<Typography variant="body2" gutterBottom></Typography>
-							<Paper className={classes.paper}>
-								<Tooltip title={i18n.t("settings.settings.closeTicketApi.note")}>
-									<FormControlLabel
-										control={
-											<IOSSwitch
-												checked={settings && settings.length > 0 && getSettingValue("closeTicketApi") === "enabled"}
-												onChange={handleChangeBooleanSetting} name="closeTicketApi"
-											/>}
-										label={i18n.t("settings.settings.closeTicketApi.name")}
-									/>
-								</Tooltip>
-							</Paper>
+							
 
 							<Typography variant="body2" gutterBottom></Typography>
 							<Paper className={classes.paper}>

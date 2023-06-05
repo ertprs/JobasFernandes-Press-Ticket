@@ -4,7 +4,8 @@ import { join } from "path";
 import { promisify } from "util";
 import { writeFile } from "fs";
 import * as Sentry from "@sentry/node";
-import { head, isNull, isNil } from "lodash";
+import { head, isNull, isNil, isNaN, isNative } from "lodash";
+import moment from "moment";
 
 import {
   Contact as WbotContact,
@@ -33,9 +34,12 @@ import UpdateTicketService from "../TicketServices/UpdateTicketService";
 import CreateContactService from "../ContactServices/CreateContactService";
 import formatBody from "../../helpers/Mustache";
 import UserRating from "../../models/UserRating";
+import TicketTraking from "../../models/TicketTraking";
 import SendWhatsAppMessage from "./SendWhatsAppMessage";
+import FindOrCreateATicketTrakingService from "../TicketServices/FindOrCreateATicketTrakingService";
 import Queue from "../../models/Queue";
 import { boolean } from "yup";
+import ShowTicketService from "../TicketServices/ShowTicketService";
 
 interface Session extends Client {
   id?: number;
@@ -240,7 +244,7 @@ const prepareLocation = (msg: WbotMessage): WbotMessage => {
   return msg;
 };
 
-const verifyMessage = async (
+export const verifyMessage = async (
   msg: WbotMessage,
   ticket: Ticket,
   contact: Contact
@@ -261,6 +265,7 @@ const verifyMessage = async (
 
   if (msg.fromMe == true) {
     await ticket.update({//texto que sai do chat tb,
+      fromMe: msg.fromMe,
       lastMessage:
         msg.type === "location"
           ? msg.location.description
@@ -398,20 +403,23 @@ const verifyQueue = async (
               const horatermino = hhtermino + mmtermino;
 
               if (hora < horainicio || hora > horatermino) {
-                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-                const debouncedSentMessage = debounce(
-                  async () => {
-                    const sentMessage = await wbot.sendMessage(
-                      `${contact.number}@c.us`,
-                      body
-                    );
-                    verifyMessage(sentMessage, ticket, contact);
-                  },
-                  3000,
-                  ticket.id
-                );
+                const absenceMessage = choosenQueue.absenceMessage;
+                if (absenceMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                  const debouncedSentMessage = debounce(
+                    async () => {
+                      const sentMessage = await wbot.sendMessage(
+                        `${contact.number}@c.us`,
+                        body
+                      );
+                      verifyMessage(sentMessage, ticket, contact);
+                    },
+                    3000,
+                    ticket.id
+                  );
 
-                debouncedSentMessage();
+                  debouncedSentMessage();
+                }
               } else {
                 await UpdateTicketService({
                   ticketData: { queueId: choosenQueue.id },
@@ -421,14 +429,17 @@ const verifyQueue = async (
                 const chat = await msg.getChat();
                 await chat.sendStateTyping();
 
-                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+                const greetingMessage = choosenQueue.greetingMessage;
+                if (greetingMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-                const sentMessage = await wbot.sendMessage(
-                  `${contact.number}@c.us`,
-                  body
-                );
+                  const sentMessage = await wbot.sendMessage(
+                    `${contact.number}@c.us`,
+                    body
+                  );
 
-                await verifyMessage(sentMessage, ticket, contact);
+                  await verifyMessage(sentMessage, ticket, contact);
+                }
               }
             }
             await UpdateTicketService({
@@ -437,6 +448,7 @@ const verifyQueue = async (
             });
             return;
           }
+
           const selectedOption = msg.body;
           const choosenQueue = queues[+selectedOption - 1];
           if (choosenQueue) {
@@ -459,20 +471,23 @@ const verifyQueue = async (
 
             if (hora < horainicio || hora > horatermino) {
               //If que identifica se o setor tem hora definida de atendimento
-              const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-              const debouncedSentMessage = debounce(
-                async () => {
-                  const sentMessage = await wbot.sendMessage(
-                    `${contact.number}@c.us`,
-                    body
-                  );
-                  verifyMessage(sentMessage, ticket, contact);
-                },
-                3000,
-                ticket.id
-              );
+              const absenceMessage = choosenQueue.absenceMessage;
+              if (absenceMessage) {
+                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                const debouncedSentMessage = debounce(
+                  async () => {
+                    const sentMessage = await wbot.sendMessage(
+                      `${contact.number}@c.us`,
+                      body
+                    );
+                    verifyMessage(sentMessage, ticket, contact);
+                  },
+                  3000,
+                  ticket.id
+                );
 
-              debouncedSentMessage();
+                debouncedSentMessage();
+              }
             } else {
               //else que retorna a mensagem de fora de expediente do setor
               await UpdateTicketService({
@@ -483,14 +498,17 @@ const verifyQueue = async (
               const chat = await msg.getChat();
               await chat.sendStateTyping();
 
-              const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+              const greetingMessage = choosenQueue.greetingMessage;
+              if (greetingMessage) {
+                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
 
-              await verifyMessage(sentMessage, ticket, contact);
+                await verifyMessage(sentMessage, ticket, contact);
+              }
             }
           } else {
             //Envia mensagem com setores
@@ -514,6 +532,7 @@ const verifyQueue = async (
 
             const body = formatBody(`\u200e${greetingMessage}\n\n${options}`, ticket);
 
+
             const debouncedSentMessage = debounce(
               async () => {
                 const sentMessage = await wbot.sendMessage(
@@ -530,23 +549,25 @@ const verifyQueue = async (
           }
         } else {
           //envia mensagem de fora do expediente, horario fora
-          const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
-          const debouncedSentMessage = debounce(
-            async () => {
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
-              verifyMessage(sentMessage, ticket, contact);
-            },
-            3000,
-            ticket.id
-          );
-          debouncedSentMessage();
+          if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
+            const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+                verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+            debouncedSentMessage();
+          }
         }
       } else {
         //envia mensagem de fora do expediente, dia desativado
-        if (outOfWorkMessage && outOfWorkMessage !== "") {
+        if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
           const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
           const debouncedSentMessage = debounce(
             async () => {
@@ -620,20 +641,23 @@ const verifyQueue = async (
               const horatermino = hhtermino + mmtermino;
 
               if (hora < horainicio || hora > horatermino) {
-                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-                const debouncedSentMessage = debounce(
-                  async () => {
-                    const sentMessage = await wbot.sendMessage(
-                      `${contact.number}@c.us`,
-                      body
-                    );
-                    verifyMessage(sentMessage, ticket, contact);
-                  },
-                  3000,
-                  ticket.id
-                );
+                const absenceMessage = choosenQueue.absenceMessage;
+                if (absenceMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                  const debouncedSentMessage = debounce(
+                    async () => {
+                      const sentMessage = await wbot.sendMessage(
+                        `${contact.number}@c.us`,
+                        body
+                      );
+                      verifyMessage(sentMessage, ticket, contact);
+                    },
+                    3000,
+                    ticket.id
+                  );
 
-                debouncedSentMessage();
+                  debouncedSentMessage();
+                }
               } else {
                 await UpdateTicketService({
                   ticketData: { queueId: choosenQueue.id },
@@ -642,15 +666,17 @@ const verifyQueue = async (
 
                 const chat = await msg.getChat();
                 await chat.sendStateTyping();
+                const greetingMessage = choosenQueue.greetingMessage;
+                if (greetingMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+                  const sentMessage = await wbot.sendMessage(
+                    `${contact.number}@c.us`,
+                    body
+                  );
 
-                const sentMessage = await wbot.sendMessage(
-                  `${contact.number}@c.us`,
-                  body
-                );
-
-                await verifyMessage(sentMessage, ticket, contact);
+                  await verifyMessage(sentMessage, ticket, contact);
+                }
               }
             }
             await UpdateTicketService({
@@ -680,21 +706,23 @@ const verifyQueue = async (
             const horatermino = hhtermino + mmtermino;
 
             if (hora < horainicio || hora > horatermino) {
-              //If que identifica se o setor tem hora definida de atendimento
-              const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-              const debouncedSentMessage = debounce(
-                async () => {
-                  const sentMessage = await wbot.sendMessage(
-                    `${contact.number}@c.us`,
-                    body
-                  );
-                  verifyMessage(sentMessage, ticket, contact);
-                },
-                3000,
-                ticket.id
-              );
+              const absenceMessage = choosenQueue.absenceMessage;
+              if (absenceMessage) {
+                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                const debouncedSentMessage = debounce(
+                  async () => {
+                    const sentMessage = await wbot.sendMessage(
+                      `${contact.number}@c.us`,
+                      body
+                    );
+                    verifyMessage(sentMessage, ticket, contact);
+                  },
+                  3000,
+                  ticket.id
+                );
 
-              debouncedSentMessage();
+                debouncedSentMessage();
+              }
             } else {
               //else que retorna a mensagem de fora de expediente do setor
               await UpdateTicketService({
@@ -705,14 +733,17 @@ const verifyQueue = async (
               const chat = await msg.getChat();
               await chat.sendStateTyping();
 
-              const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+              const greetingMessage = choosenQueue.greetingMessage;
+              if (greetingMessage) {
+                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
 
-              await verifyMessage(sentMessage, ticket, contact);
+                await verifyMessage(sentMessage, ticket, contact);
+              }
             }
           } else {
             //Envia mensagem com setores
@@ -752,19 +783,21 @@ const verifyQueue = async (
           }
         } else {
           //envia mensagem de fora do expediente, horario fora
-          const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
-          const debouncedSentMessage = debounce(
-            async () => {
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
-              verifyMessage(sentMessage, ticket, contact);
-            },
-            3000,
-            ticket.id
-          );
-          debouncedSentMessage();
+          if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
+            const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+                verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+            debouncedSentMessage();
+          }
         }
       } else {
         //envia mensagem de fora do expediente, dia desativado
@@ -842,20 +875,23 @@ const verifyQueue = async (
               const horatermino = hhtermino + mmtermino;
 
               if (hora < horainicio || hora > horatermino) {
-                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-                const debouncedSentMessage = debounce(
-                  async () => {
-                    const sentMessage = await wbot.sendMessage(
-                      `${contact.number}@c.us`,
-                      body
-                    );
-                    verifyMessage(sentMessage, ticket, contact);
-                  },
-                  3000,
-                  ticket.id
-                );
+                const absenceMessage = choosenQueue.absenceMessage;
+                if (absenceMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                  const debouncedSentMessage = debounce(
+                    async () => {
+                      const sentMessage = await wbot.sendMessage(
+                        `${contact.number}@c.us`,
+                        body
+                      );
+                      verifyMessage(sentMessage, ticket, contact);
+                    },
+                    3000,
+                    ticket.id
+                  );
 
-                debouncedSentMessage();
+                  debouncedSentMessage();
+                }
               } else {
                 await UpdateTicketService({
                   ticketData: { queueId: choosenQueue.id },
@@ -864,15 +900,17 @@ const verifyQueue = async (
 
                 const chat = await msg.getChat();
                 await chat.sendStateTyping();
+                const greetingMessage = choosenQueue.greetingMessage;
+                if (greetingMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+                  const sentMessage = await wbot.sendMessage(
+                    `${contact.number}@c.us`,
+                    body
+                  );
 
-                const sentMessage = await wbot.sendMessage(
-                  `${contact.number}@c.us`,
-                  body
-                );
-
-                await verifyMessage(sentMessage, ticket, contact);
+                  await verifyMessage(sentMessage, ticket, contact);
+                }
               }
             }
             await UpdateTicketService({
@@ -902,21 +940,23 @@ const verifyQueue = async (
             const horatermino = hhtermino + mmtermino;
 
             if (hora < horainicio || hora > horatermino) {
-              //If que identifica se o setor tem hora definida de atendimento
-              const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-              const debouncedSentMessage = debounce(
-                async () => {
-                  const sentMessage = await wbot.sendMessage(
-                    `${contact.number}@c.us`,
-                    body
-                  );
-                  verifyMessage(sentMessage, ticket, contact);
-                },
-                3000,
-                ticket.id
-              );
+              const absenceMessage = choosenQueue.absenceMessage;
+              if (absenceMessage) {
+                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                const debouncedSentMessage = debounce(
+                  async () => {
+                    const sentMessage = await wbot.sendMessage(
+                      `${contact.number}@c.us`,
+                      body
+                    );
+                    verifyMessage(sentMessage, ticket, contact);
+                  },
+                  3000,
+                  ticket.id
+                );
 
-              debouncedSentMessage();
+                debouncedSentMessage();
+              }
             } else {
               //else que retorna a mensagem de fora de expediente do setor
               await UpdateTicketService({
@@ -927,14 +967,17 @@ const verifyQueue = async (
               const chat = await msg.getChat();
               await chat.sendStateTyping();
 
-              const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+              const greetingMessage = choosenQueue.greetingMessage;
+              if (greetingMessage) {
+                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
 
-              await verifyMessage(sentMessage, ticket, contact);
+                await verifyMessage(sentMessage, ticket, contact);
+              }
             }
           } else {
             //Envia mensagem com setores
@@ -974,19 +1017,21 @@ const verifyQueue = async (
           }
         } else {
           //envia mensagem de fora do expediente, horario fora
-          const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
-          const debouncedSentMessage = debounce(
-            async () => {
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
-              verifyMessage(sentMessage, ticket, contact);
-            },
-            3000,
-            ticket.id
-          );
-          debouncedSentMessage();
+          if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
+            const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+                verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+            debouncedSentMessage();
+          }
         }
       } else {
         //envia mensagem de fora do expediente, dia desativado
@@ -1064,20 +1109,23 @@ const verifyQueue = async (
               const horatermino = hhtermino + mmtermino;
 
               if (hora < horainicio || hora > horatermino) {
-                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-                const debouncedSentMessage = debounce(
-                  async () => {
-                    const sentMessage = await wbot.sendMessage(
-                      `${contact.number}@c.us`,
-                      body
-                    );
-                    verifyMessage(sentMessage, ticket, contact);
-                  },
-                  3000,
-                  ticket.id
-                );
+                const absenceMessage = choosenQueue.absenceMessage;
+                if (absenceMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                  const debouncedSentMessage = debounce(
+                    async () => {
+                      const sentMessage = await wbot.sendMessage(
+                        `${contact.number}@c.us`,
+                        body
+                      );
+                      verifyMessage(sentMessage, ticket, contact);
+                    },
+                    3000,
+                    ticket.id
+                  );
 
-                debouncedSentMessage();
+                  debouncedSentMessage();
+                }
               } else {
                 await UpdateTicketService({
                   ticketData: { queueId: choosenQueue.id },
@@ -1086,15 +1134,17 @@ const verifyQueue = async (
 
                 const chat = await msg.getChat();
                 await chat.sendStateTyping();
+                const greetingMessage = choosenQueue.greetingMessage;
+                if (greetingMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+                  const sentMessage = await wbot.sendMessage(
+                    `${contact.number}@c.us`,
+                    body
+                  );
 
-                const sentMessage = await wbot.sendMessage(
-                  `${contact.number}@c.us`,
-                  body
-                );
-
-                await verifyMessage(sentMessage, ticket, contact);
+                  await verifyMessage(sentMessage, ticket, contact);
+                }
               }
             }
             await UpdateTicketService({
@@ -1124,21 +1174,23 @@ const verifyQueue = async (
             const horatermino = hhtermino + mmtermino;
 
             if (hora < horainicio || hora > horatermino) {
-              //If que identifica se o setor tem hora definida de atendimento
-              const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-              const debouncedSentMessage = debounce(
-                async () => {
-                  const sentMessage = await wbot.sendMessage(
-                    `${contact.number}@c.us`,
-                    body
-                  );
-                  verifyMessage(sentMessage, ticket, contact);
-                },
-                3000,
-                ticket.id
-              );
+              const absenceMessage = choosenQueue.absenceMessage;
+              if (absenceMessage) {
+                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                const debouncedSentMessage = debounce(
+                  async () => {
+                    const sentMessage = await wbot.sendMessage(
+                      `${contact.number}@c.us`,
+                      body
+                    );
+                    verifyMessage(sentMessage, ticket, contact);
+                  },
+                  3000,
+                  ticket.id
+                );
 
-              debouncedSentMessage();
+                debouncedSentMessage();
+              }
             } else {
               //else que retorna a mensagem de fora de expediente do setor
               await UpdateTicketService({
@@ -1149,14 +1201,17 @@ const verifyQueue = async (
               const chat = await msg.getChat();
               await chat.sendStateTyping();
 
-              const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+              const greetingMessage = choosenQueue.greetingMessage;
+              if (greetingMessage) {
+                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
 
-              await verifyMessage(sentMessage, ticket, contact);
+                await verifyMessage(sentMessage, ticket, contact);
+              }
             }
           } else {
             //Envia mensagem com setores
@@ -1196,19 +1251,21 @@ const verifyQueue = async (
           }
         } else {
           //envia mensagem de fora do expediente, horario fora
-          const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
-          const debouncedSentMessage = debounce(
-            async () => {
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
-              verifyMessage(sentMessage, ticket, contact);
-            },
-            3000,
-            ticket.id
-          );
-          debouncedSentMessage();
+          if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
+            const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+                verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+            debouncedSentMessage();
+          }
         }
       } else {
         //envia mensagem de fora do expediente, dia desativado
@@ -1235,7 +1292,7 @@ const verifyQueue = async (
     if (diaSemana === 4) {
       diaSemanaStr = "thursday"
 
-      console.log(thursday)
+      // console.log(thursday)
       //if que identifica o dia da semana
       if (thursday === true) {
         //if que identifica se o dia da semana está ativo
@@ -1243,7 +1300,7 @@ const verifyQueue = async (
         const mm: number = now.getMinutes() * 60;
         const hora = hh + mm;
 
-        console.log(StartDefineWorkHoursThursday)
+        // console.log(StartDefineWorkHoursThursday)
 
         const start: string = StartDefineWorkHoursThursday;
         const hhStart = Number(start.split(":")[0]) * 60 * 60;
@@ -1291,20 +1348,23 @@ const verifyQueue = async (
               const horatermino = hhtermino + mmtermino;
 
               if (hora < horainicio || hora > horatermino) {
-                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-                const debouncedSentMessage = debounce(
-                  async () => {
-                    const sentMessage = await wbot.sendMessage(
-                      `${contact.number}@c.us`,
-                      body
-                    );
-                    verifyMessage(sentMessage, ticket, contact);
-                  },
-                  3000,
-                  ticket.id
-                );
+                const absenceMessage = choosenQueue.absenceMessage;
+                if (absenceMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                  const debouncedSentMessage = debounce(
+                    async () => {
+                      const sentMessage = await wbot.sendMessage(
+                        `${contact.number}@c.us`,
+                        body
+                      );
+                      verifyMessage(sentMessage, ticket, contact);
+                    },
+                    3000,
+                    ticket.id
+                  );
 
-                debouncedSentMessage();
+                  debouncedSentMessage();
+                }
               } else {
                 await UpdateTicketService({
                   ticketData: { queueId: choosenQueue.id },
@@ -1313,15 +1373,17 @@ const verifyQueue = async (
 
                 const chat = await msg.getChat();
                 await chat.sendStateTyping();
+                const greetingMessage = choosenQueue.greetingMessage;
+                if (greetingMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+                  const sentMessage = await wbot.sendMessage(
+                    `${contact.number}@c.us`,
+                    body
+                  );
 
-                const sentMessage = await wbot.sendMessage(
-                  `${contact.number}@c.us`,
-                  body
-                );
-
-                await verifyMessage(sentMessage, ticket, contact);
+                  await verifyMessage(sentMessage, ticket, contact);
+                }
               }
             }
             await UpdateTicketService({
@@ -1351,21 +1413,23 @@ const verifyQueue = async (
             const horatermino = hhtermino + mmtermino;
 
             if (hora < horainicio || hora > horatermino) {
-              //If que identifica se o setor tem hora definida de atendimento
-              const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-              const debouncedSentMessage = debounce(
-                async () => {
-                  const sentMessage = await wbot.sendMessage(
-                    `${contact.number}@c.us`,
-                    body
-                  );
-                  verifyMessage(sentMessage, ticket, contact);
-                },
-                3000,
-                ticket.id
-              );
+              const absenceMessage = choosenQueue.absenceMessage;
+              if (absenceMessage) {
+                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                const debouncedSentMessage = debounce(
+                  async () => {
+                    const sentMessage = await wbot.sendMessage(
+                      `${contact.number}@c.us`,
+                      body
+                    );
+                    verifyMessage(sentMessage, ticket, contact);
+                  },
+                  3000,
+                  ticket.id
+                );
 
-              debouncedSentMessage();
+                debouncedSentMessage();
+              }
             } else {
               //else que retorna a mensagem de fora de expediente do setor
               await UpdateTicketService({
@@ -1376,14 +1440,17 @@ const verifyQueue = async (
               const chat = await msg.getChat();
               await chat.sendStateTyping();
 
-              const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+              const greetingMessage = choosenQueue.greetingMessage;
+              if (greetingMessage) {
+                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
 
-              await verifyMessage(sentMessage, ticket, contact);
+                await verifyMessage(sentMessage, ticket, contact);
+              }
             }
           } else {
             //Envia mensagem com setores
@@ -1423,19 +1490,21 @@ const verifyQueue = async (
           }
         } else {
           //envia mensagem de fora do expediente, horario fora
-          const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
-          const debouncedSentMessage = debounce(
-            async () => {
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
-              verifyMessage(sentMessage, ticket, contact);
-            },
-            3000,
-            ticket.id
-          );
-          debouncedSentMessage();
+          if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
+            const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+                verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+            debouncedSentMessage();
+          }
         }
       } else {
         //envia mensagem de fora do expediente, dia desativado
@@ -1513,20 +1582,23 @@ const verifyQueue = async (
               const horatermino = hhtermino + mmtermino;
 
               if (hora < horainicio || hora > horatermino) {
-                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-                const debouncedSentMessage = debounce(
-                  async () => {
-                    const sentMessage = await wbot.sendMessage(
-                      `${contact.number}@c.us`,
-                      body
-                    );
-                    verifyMessage(sentMessage, ticket, contact);
-                  },
-                  3000,
-                  ticket.id
-                );
+                const absenceMessage = choosenQueue.absenceMessage;
+                if (absenceMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                  const debouncedSentMessage = debounce(
+                    async () => {
+                      const sentMessage = await wbot.sendMessage(
+                        `${contact.number}@c.us`,
+                        body
+                      );
+                      verifyMessage(sentMessage, ticket, contact);
+                    },
+                    3000,
+                    ticket.id
+                  );
 
-                debouncedSentMessage();
+                  debouncedSentMessage();
+                }
               } else {
                 await UpdateTicketService({
                   ticketData: { queueId: choosenQueue.id },
@@ -1535,15 +1607,17 @@ const verifyQueue = async (
 
                 const chat = await msg.getChat();
                 await chat.sendStateTyping();
+                const greetingMessage = choosenQueue.greetingMessage;
+                if (greetingMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+                  const sentMessage = await wbot.sendMessage(
+                    `${contact.number}@c.us`,
+                    body
+                  );
 
-                const sentMessage = await wbot.sendMessage(
-                  `${contact.number}@c.us`,
-                  body
-                );
-
-                await verifyMessage(sentMessage, ticket, contact);
+                  await verifyMessage(sentMessage, ticket, contact);
+                }
               }
             }
             await UpdateTicketService({
@@ -1573,21 +1647,23 @@ const verifyQueue = async (
             const horatermino = hhtermino + mmtermino;
 
             if (hora < horainicio || hora > horatermino) {
-              //If que identifica se o setor tem hora definida de atendimento
-              const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-              const debouncedSentMessage = debounce(
-                async () => {
-                  const sentMessage = await wbot.sendMessage(
-                    `${contact.number}@c.us`,
-                    body
-                  );
-                  verifyMessage(sentMessage, ticket, contact);
-                },
-                3000,
-                ticket.id
-              );
+              const absenceMessage = choosenQueue.absenceMessage;
+              if (absenceMessage) {
+                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                const debouncedSentMessage = debounce(
+                  async () => {
+                    const sentMessage = await wbot.sendMessage(
+                      `${contact.number}@c.us`,
+                      body
+                    );
+                    verifyMessage(sentMessage, ticket, contact);
+                  },
+                  3000,
+                  ticket.id
+                );
 
-              debouncedSentMessage();
+                debouncedSentMessage();
+              }
             } else {
               //else que retorna a mensagem de fora de expediente do setor
               await UpdateTicketService({
@@ -1598,14 +1674,17 @@ const verifyQueue = async (
               const chat = await msg.getChat();
               await chat.sendStateTyping();
 
-              const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+              const greetingMessage = choosenQueue.greetingMessage;
+              if (greetingMessage) {
+                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
 
-              await verifyMessage(sentMessage, ticket, contact);
+                await verifyMessage(sentMessage, ticket, contact);
+              }
             }
           } else {
             //Envia mensagem com setores
@@ -1645,19 +1724,21 @@ const verifyQueue = async (
           }
         } else {
           //envia mensagem de fora do expediente, horario fora
-          const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
-          const debouncedSentMessage = debounce(
-            async () => {
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
-              verifyMessage(sentMessage, ticket, contact);
-            },
-            3000,
-            ticket.id
-          );
-          debouncedSentMessage();
+          if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
+            const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+                verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+            debouncedSentMessage();
+          }
         }
       } else {
         //envia mensagem de fora do expediente, dia desativado
@@ -1735,20 +1816,23 @@ const verifyQueue = async (
               const horatermino = hhtermino + mmtermino;
 
               if (hora < horainicio || hora > horatermino) {
-                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-                const debouncedSentMessage = debounce(
-                  async () => {
-                    const sentMessage = await wbot.sendMessage(
-                      `${contact.number}@c.us`,
-                      body
-                    );
-                    verifyMessage(sentMessage, ticket, contact);
-                  },
-                  3000,
-                  ticket.id
-                );
+                const absenceMessage = choosenQueue.absenceMessage;
+                if (absenceMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                  const debouncedSentMessage = debounce(
+                    async () => {
+                      const sentMessage = await wbot.sendMessage(
+                        `${contact.number}@c.us`,
+                        body
+                      );
+                      verifyMessage(sentMessage, ticket, contact);
+                    },
+                    3000,
+                    ticket.id
+                  );
 
-                debouncedSentMessage();
+                  debouncedSentMessage();
+                }
               } else {
                 await UpdateTicketService({
                   ticketData: { queueId: choosenQueue.id },
@@ -1757,15 +1841,17 @@ const verifyQueue = async (
 
                 const chat = await msg.getChat();
                 await chat.sendStateTyping();
+                const greetingMessage = choosenQueue.greetingMessage;
+                if (greetingMessage) {
+                  const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+                  const sentMessage = await wbot.sendMessage(
+                    `${contact.number}@c.us`,
+                    body
+                  );
 
-                const sentMessage = await wbot.sendMessage(
-                  `${contact.number}@c.us`,
-                  body
-                );
-
-                await verifyMessage(sentMessage, ticket, contact);
+                  await verifyMessage(sentMessage, ticket, contact);
+                }
               }
             }
             await UpdateTicketService({
@@ -1795,21 +1881,23 @@ const verifyQueue = async (
             const horatermino = hhtermino + mmtermino;
 
             if (hora < horainicio || hora > horatermino) {
-              //If que identifica se o setor tem hora definida de atendimento
-              const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-              const debouncedSentMessage = debounce(
-                async () => {
-                  const sentMessage = await wbot.sendMessage(
-                    `${contact.number}@c.us`,
-                    body
-                  );
-                  verifyMessage(sentMessage, ticket, contact);
-                },
-                3000,
-                ticket.id
-              );
+              const absenceMessage = choosenQueue.absenceMessage;
+              if (absenceMessage) {
+                const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+                const debouncedSentMessage = debounce(
+                  async () => {
+                    const sentMessage = await wbot.sendMessage(
+                      `${contact.number}@c.us`,
+                      body
+                    );
+                    verifyMessage(sentMessage, ticket, contact);
+                  },
+                  3000,
+                  ticket.id
+                );
 
-              debouncedSentMessage();
+                debouncedSentMessage();
+              }
             } else {
               //else que retorna a mensagem de fora de expediente do setor
               await UpdateTicketService({
@@ -1820,14 +1908,17 @@ const verifyQueue = async (
               const chat = await msg.getChat();
               await chat.sendStateTyping();
 
-              const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+              const greetingMessage = choosenQueue.greetingMessage;
+              if (greetingMessage) {
+                const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
 
-              await verifyMessage(sentMessage, ticket, contact);
+                await verifyMessage(sentMessage, ticket, contact);
+              }
             }
           } else {
             //Envia mensagem com setores
@@ -1867,19 +1958,21 @@ const verifyQueue = async (
           }
         } else {
           //envia mensagem de fora do expediente, horario fora
-          const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
-          const debouncedSentMessage = debounce(
-            async () => {
-              const sentMessage = await wbot.sendMessage(
-                `${contact.number}@c.us`,
-                body
-              );
-              verifyMessage(sentMessage, ticket, contact);
-            },
-            3000,
-            ticket.id
-          );
-          debouncedSentMessage();
+          if (outOfWorkMessage && outOfWorkMessage.trim() !== "") {
+            const body = formatBody(`\u200e${outOfWorkMessage}`, ticket);
+            const debouncedSentMessage = debounce(
+              async () => {
+                const sentMessage = await wbot.sendMessage(
+                  `${contact.number}@c.us`,
+                  body
+                );
+                verifyMessage(sentMessage, ticket, contact);
+              },
+              3000,
+              ticket.id
+            );
+            debouncedSentMessage();
+          }
         }
       } else {
         //envia mensagem de fora do expediente, dia desativado
@@ -1928,20 +2021,23 @@ const verifyQueue = async (
       const horatermino = hhtermino + mmtermino;
 
       if (hora < horainicio || hora > horatermino) {
-        const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-        const debouncedSentMessage = debounce(
-          async () => {
-            const sentMessage = await wbot.sendMessage(
-              `${contact.number}@c.us`,
-              body
-            );
-            verifyMessage(sentMessage, ticket, contact);
-          },
-          3000,
-          ticket.id
-        );
+        const absenceMessage = choosenQueue.absenceMessage;
+        if (absenceMessage) {
+          const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+          const debouncedSentMessage = debounce(
+            async () => {
+              const sentMessage = await wbot.sendMessage(
+                `${contact.number}@c.us`,
+                body
+              );
+              verifyMessage(sentMessage, ticket, contact);
+            },
+            3000,
+            ticket.id
+          );
 
-        debouncedSentMessage();
+          debouncedSentMessage();
+        }
       } else {
         await UpdateTicketService({
           ticketData: { queueId: choosenQueue.id },
@@ -1950,15 +2046,17 @@ const verifyQueue = async (
 
         const chat = await msg.getChat();
         await chat.sendStateTyping();
+        const greetingMessage = choosenQueue.greetingMessage;
+        if (greetingMessage) {
+          const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-        const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+          const sentMessage = await wbot.sendMessage(
+            `${contact.number}@c.us`,
+            body
+          );
 
-        const sentMessage = await wbot.sendMessage(
-          `${contact.number}@c.us`,
-          body
-        );
-
-        await verifyMessage(sentMessage, ticket, contact);
+          await verifyMessage(sentMessage, ticket, contact);
+        }
       }
     }
 
@@ -1989,20 +2087,23 @@ const verifyQueue = async (
     const horatermino = hhtermino + mmtermino;
 
     if (hora < horainicio || hora > horatermino) {
-      const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
-      const debouncedSentMessage = debounce(
-        async () => {
-          const sentMessage = await wbot.sendMessage(
-            `${contact.number}@c.us`,
-            body
-          );
-          verifyMessage(sentMessage, ticket, contact);
-        },
-        3000,
-        ticket.id
-      );
+      const absenceMessage = choosenQueue.absenceMessage;
+      if (absenceMessage) {
+        const body = formatBody(`\u200e${choosenQueue.absenceMessage}`, ticket);
+        const debouncedSentMessage = debounce(
+          async () => {
+            const sentMessage = await wbot.sendMessage(
+              `${contact.number}@c.us`,
+              body
+            );
+            verifyMessage(sentMessage, ticket, contact);
+          },
+          3000,
+          ticket.id
+        );
 
-      debouncedSentMessage();
+        debouncedSentMessage();
+      }
     } else {
       await UpdateTicketService({
         ticketData: { queueId: choosenQueue.id },
@@ -2011,15 +2112,17 @@ const verifyQueue = async (
 
       const chat = await msg.getChat();
       await chat.sendStateTyping();
+      const greetingMessage = choosenQueue.greetingMessage;
+      if (greetingMessage) {
+        const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
 
-      const body = formatBody(`\u200e${choosenQueue.greetingMessage}`, ticket);
+        const sentMessage = await wbot.sendMessage(
+          `${contact.number}@c.us`,
+          body
+        );
 
-      const sentMessage = await wbot.sendMessage(
-        `${contact.number}@c.us`,
-        body
-      );
-
-      await verifyMessage(sentMessage, ticket, contact);
+        await verifyMessage(sentMessage, ticket, contact);
+      }
     }
   } else {
     let options = "";
@@ -2108,6 +2211,7 @@ const handleMessage = async (
       return;
     }
   }
+
   // IGNORAR MENSAGENS DE GRUPO
 
   try {
@@ -2116,13 +2220,16 @@ const handleMessage = async (
     let queueId: number = 0;
     let tagsId: number = 0;
     let userId: number = 0;
+    let isBody: boolean = false;
 
     // console.log(msg)
     if (msg.fromMe) {
       // messages sent automatically by wbot have a special character in front of it
       // if so, this message was already been stored in database;
-      if (/\u200e/.test(msg.body[0])) return;
 
+      isBody = /\u200e/.test(msg.body[0]);
+      console.log("ISBODY  " + isBody)
+      if (isBody) return;
       // media messages sent from me from cell phone, first comes with "hasMedia = false" and type = "image/ptt/etc"
       // in this case, return and let this message be handled by "media_uploaded" event, when it will have "hasMedia = true"
 
@@ -2162,7 +2269,7 @@ const handleMessage = async (
 
     const contact = await verifyContact(msgContact);
 
-
+    // console.log("OUTRO TESTE " + unreadMessages)
     let ticket = await FindOrCreateTicketService(
       contact,
       wbot.id!,
@@ -2173,28 +2280,15 @@ const handleMessage = async (
       groupContact
     );
 
-    try {
-      if (!msg.fromMe) {
-        const ratePending = await verifyRating(ticket);
-        /**
-         * Tratamento para avaliação do atendente
-         */
-        if (ratePending) {
-          handleRating(msg, ticket);
-          return;
-        }
-      }
-    } catch (e) {
-      Sentry.captureException(e);
-      console.log(e);
-    }
 
     if (
-      unreadMessages === 0 &&
-      whatsapp.farewellMessage &&
-      formatBody(whatsapp.farewellMessage, ticket) === msg.body
-    )
+      (unreadMessages === 0 &&
+        whatsapp.farewellMessage &&
+        formatBody(whatsapp.farewellMessage, ticket) === msg.body)) {
+      console.log("entrou aquii IF 2193")
       return;
+    }
+
 
     ticket = await FindOrCreateTicketService(
       contact,
@@ -2205,6 +2299,47 @@ const handleMessage = async (
       userId,
       groupContact
     );
+
+    if (msg.body === "#" && ticket.userId === null) {
+      await ticket.update({
+        queueOptionId: null,
+        chatbot: true,
+        queueId: null,
+      });
+      await verifyQueue(wbot, msg, ticket, ticket.contact);
+      return;
+    }
+
+    const ticketTraking = await FindOrCreateATicketTrakingService({
+      ticketId: ticket.id,
+      whatsappId: whatsapp?.id,
+      userId: ticket.userId
+    });
+
+    try {
+      if (!msg.fromMe) {
+        if (ticketTraking !== null && verifyRating(ticketTraking) && whatsapp.ratingMessage) {
+          let rate = +msg.body;
+          //testa se o usuário digitou uma avaliação numérica, se não enviou, envia novametne a mensagem de avaliação
+          if (!Number.isNaN(rate) && Number.isInteger(rate) && !isNull(rate)) {
+            handleRating(msg, ticket, ticketTraking);
+            return;
+          }
+          else {
+            let bodyRatingMessage = `\u200e${whatsapp.ratingMessage}\n`;
+
+            const msg = await SendWhatsAppMessage({ body: bodyRatingMessage, ticket });
+
+            await verifyMessage(msg, ticket, ticket.contact);
+
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      Sentry.captureException(e);
+      console.log(e);
+    }
 
     if (msg.hasMedia) {
       await verifyMediaMessage(msg, ticket, contact);
@@ -2220,6 +2355,19 @@ const handleMessage = async (
       whatsapp.queues.length >= 1
     ) {
       await verifyQueue(wbot, msg, ticket, contact);
+    }
+
+    // Atualiza o ticket se a ultima mensagem foi enviada por mim, para que possa ser finalizado. Se for grupo, nao finaliza
+    try {
+      // console.log("FROMME"+ msg.fromMe+" GRUPO "+(await msg.getChat()).isGroup)
+
+      await ticket.update({
+        fromMe: msg.fromMe,
+        isMsgGroup: chat.isGroup
+      });
+    } catch (e) {
+      Sentry.captureException(e);
+      console.log(e);
     }
 
     if (msg.type === "vcard") {
@@ -2328,55 +2476,69 @@ const handleMessage = async (
   }
 };
 
-const verifyRating = async (ticket: Ticket) => {
-  const record = await UserRating.findOne({
-    where: { ticketId: ticket.id, rate: null }
-  });
-  if (record) {
+export const verifyRating = (ticketTraking: TicketTraking) => {
+  if (
+    ticketTraking &&
+    ticketTraking.finishedAt === null &&
+    ticketTraking.closedAt !== null &&
+    ticketTraking.userId !== null &&
+    ticketTraking.ratingAt === null
+  ) {
     return true;
   }
   return false;
 };
 
-const handleRating = async (msg: WbotMessage, ticket: Ticket) => {
+
+
+const handleRating = async (msg: WbotMessage, ticket: Ticket, ticketTraking: TicketTraking) => {
   const io = getIO();
   let rate: number | null = null;
 
   const bodyMessage = msg.body;
+  const { farewellMessage, ratingMessage } = await ShowWhatsAppService(ticket.whatsappId);
+
 
   if (bodyMessage) {
     rate = +bodyMessage;
   }
 
   if (!Number.isNaN(rate) && Number.isInteger(rate) && !isNull(rate)) {
-    const { farewellMessage } = await ShowWhatsAppService(ticket.whatsappId);
 
     let finalRate = rate;
 
-    if (rate < 1) {
-      finalRate = 1;
+    if (rate < 0) {
+      finalRate = 0;
     }
-    if (rate > 3) {
-      finalRate = 3;
+    if (rate > 10) {
+      finalRate = 10;
     }
 
-    const record = await UserRating.findOne({
-      where: {
-        ticketId: ticket.id,
-        rate: null
-      }
+
+
+    await UserRating.create({
+      ticketId: ticketTraking.ticketId,
+      userId: ticketTraking.userId,
+      rate: finalRate,
     });
 
-    await record?.update({ rate: finalRate });
+    // await record?.update({ rate: finalRate });
 
-    const body = `\u200c${farewellMessage}`;
-    await SendWhatsAppMessage({ body, ticket });
+    if (farewellMessage.trim() !== '') {
+      const body = `\u200e${farewellMessage}`;
+
+      await SendWhatsAppMessage({ body, ticket });
+    }
+    await ticketTraking.update({
+      ratingAt: moment().toDate(),
+      finishedAt: moment().toDate(),
+      rated: true,
+    });
 
     await ticket.update({
-      queueId: null,
-      userId: null,
       status: "closed"
     });
+
 
     io.to("open").emit(`ticket`, {
       action: "delete",
@@ -2397,6 +2559,7 @@ const handleMsgAck = async (msg: WbotMessage, ack: MessageAck) => {
 
   const io = getIO();
 
+  // console.log("entrou no ack" + msg.body)
   try {
     const messageToUpdate = await Message.findByPk(msg.id.id, {
       include: [

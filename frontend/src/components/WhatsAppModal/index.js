@@ -20,6 +20,9 @@ import {
   FormGroup,
   Tooltip,
   Grid,
+  MenuItem,
+  InputLabel,
+  Select,
   Checkbox,
 } from "@material-ui/core";
 
@@ -112,48 +115,55 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
     isDisplay: false,
     transferTicketMessage: "",
     isGroup: false,
+    inactiveMessage: "",
+    sendInactiveMessage: false,
+    timeInactiveMessage: "",
   };
   const [whatsApp, setWhatsApp] = useState(initialState);
   const [selectedQueueIds, setSelectedQueueIds] = useState([]);
 
-  const [defineWorkHours, SetDefineWorkHours] = useState(false);
+  const [defineWorkHours, SetDefineWorkHours] = useState("");
   const [outOfWorkMessage, setOutOfWorkMessage] = useState("");
 
-  const [StartDefineWorkHoursMonday, setStartDefineWorkHoursMonday] = useState("08:00");
-  const [EndDefineWorkHoursMonday, setEndDefineWorkHoursMonday] = useState("18:00");
-  const [StartDefineWorkHoursMondayLunch, setStartDefineWorkHoursMondayLunch] = useState("12:00");
-  const [EndDefineWorkHoursMondayLunch, setEndDefineWorkHoursMondayLunch] = useState("13:00");
+  const [StartDefineWorkHoursMonday, setStartDefineWorkHoursMonday] = useState('08:00');
+  const [EndDefineWorkHoursMonday, setEndDefineWorkHoursMonday] = useState('18:00')
+  const [StartDefineWorkHoursMondayLunch, setStartDefineWorkHoursMondayLunch] = useState('12:00')
+  const [EndDefineWorkHoursMondayLunch, setEndDefineWorkHoursMondayLunch] = useState('13:00')
 
-  const [StartDefineWorkHoursTuesday, setStartDefineWorkHoursTuesday] = useState("08:00");
-  const [EndDefineWorkHoursTuesday, setEndDefineWorkHoursTuesday] = useState("18:00");
-  const [StartDefineWorkHoursTuesdayLunch, setStartDefineWorkHoursTuesdayLunch] = useState("12:00");
-  const [EndDefineWorkHoursTuesdayLunch, setEndDefineWorkHoursTuesdayLunch] = useState("13:00");
+  const [StartDefineWorkHoursTuesday, setStartDefineWorkHoursTuesday] = useState('08:00')
+  const [EndDefineWorkHoursTuesday, setEndDefineWorkHoursTuesday] = useState('18:00')
+  const [StartDefineWorkHoursTuesdayLunch, setStartDefineWorkHoursTuesdayLunch] = useState('12:00')
+  const [EndDefineWorkHoursTuesdayLunch, setEndDefineWorkHoursTuesdayLunch] = useState('13:00')
 
-  const [StartDefineWorkHoursWednesday, setStartDefineWorkHoursWednesday] = useState("08:00");
-  const [EndDefineWorkHoursWednesday, setEndDefineWorkHoursWednesday] = useState("18:00");
-  const [StartDefineWorkHoursWednesdayLunch, setStartDefineWorkHoursWednesdayLunch] = useState("12:00");
-  const [EndDefineWorkHoursWednesdayLunch, setEndDefineWorkHoursWednesdayLunch] = useState("13:00");
+  const [StartDefineWorkHoursWednesday, setStartDefineWorkHoursWednesday] = useState('08:00')
+  const [EndDefineWorkHoursWednesday, setEndDefineWorkHoursWednesday] = useState('18:00')
+  const [StartDefineWorkHoursWednesdayLunch, setStartDefineWorkHoursWednesdayLunch] = useState('12:00')
+  const [EndDefineWorkHoursWednesdayLunch, setEndDefineWorkHoursWednesdayLunch] = useState('13:00')
 
-  const [StartDefineWorkHoursThursday, setStartDefineWorkHoursThursday] = useState("08:00");
-  const [EndDefineWorkHoursThursday, setEndDefineWorkHoursThursday] = useState("18:00");
-  const [StartDefineWorkHoursThursdayLunch, setStartDefineWorkHoursThursdayLunch] = useState("12:00");
-  const [EndDefineWorkHoursThursdayLunch, setEndDefineWorkHoursThursdayLunch] = useState("13:00");
+  const [StartDefineWorkHoursThursday, setStartDefineWorkHoursThursday] = useState('08:00')
+  const [EndDefineWorkHoursThursday, setEndDefineWorkHoursThursday] = useState('18:00')
+  const [StartDefineWorkHoursThursdayLunch, setStartDefineWorkHoursThursdayLunch] = useState('12:00')
+  const [EndDefineWorkHoursThursdayLunch, setEndDefineWorkHoursThursdayLunch] = useState('13:00')
 
-  const [StartDefineWorkHoursFriday, setStartDefineWorkHoursFriday] = useState("08:00");
-  const [EndDefineWorkHoursFriday, setEndDefineWorkHoursFriday] = useState("18:00");
-  const [StartDefineWorkHoursFridayLunch, setStartDefineWorkHoursFridayLunch] = useState("12:00");
-  const [EndDefineWorkHoursFridayLunch, setEndDefineWorkHoursFridayLunch] = useState("13:00");
+  const [StartDefineWorkHoursFriday, setStartDefineWorkHoursFriday] = useState('08:00')
+  const [EndDefineWorkHoursFriday, setEndDefineWorkHoursFriday] = useState('18:00')
+  const [StartDefineWorkHoursFridayLunch, setStartDefineWorkHoursFridayLunch] = useState('12:00')
+  const [EndDefineWorkHoursFridayLunch, setEndDefineWorkHoursFridayLunch] = useState('13:00')
 
-  const [StartDefineWorkHoursSaturday, setStartDefineWorkHoursSaturday] = useState("08:00");
-  const [EndDefineWorkHoursSaturday, setEndDefineWorkHoursSaturday] = useState("18:00");
-  const [StartDefineWorkHoursSaturdayLunch, setStartDefineWorkHoursSaturdayLunch] = useState("12:00");
-  const [EndDefineWorkHoursSaturdayLunch, setEndDefineWorkHoursSaturdayLunch] = useState("13:00");
+  const [StartDefineWorkHoursSaturday, setStartDefineWorkHoursSaturday] = useState("");
+  const [EndDefineWorkHoursSaturday, setEndDefineWorkHoursSaturday] = useState("");
+  const [StartDefineWorkHoursSaturdayLunch, setStartDefineWorkHoursSaturdayLunch] = useState("");
+  const [EndDefineWorkHoursSaturdayLunch, setEndDefineWorkHoursSaturdayLunch] = useState("");
 
-  const [StartDefineWorkHoursSunday, setStartDefineWorkHoursSunday] = useState("08:00");
-  const [EndDefineWorkHoursSunday, setEndDefineWorkHoursSunday] = useState("18:00");
-  const [StartDefineWorkHoursSundayLunch, setStartDefineWorkHoursSundayLunch] = useState("12:00");
-  const [EndDefineWorkHoursSundayLunch, setEndDefineWorkHoursSundayLunch] = useState("13:00");
+  const [StartDefineWorkHoursSunday, setStartDefineWorkHoursSunday] = useState("");
+  const [EndDefineWorkHoursSunday, setEndDefineWorkHoursSunday] = useState("");
+  const [StartDefineWorkHoursSundayLunch, setStartDefineWorkHoursSundayLunch] = useState("");
+  const [EndDefineWorkHoursSundayLunch, setEndDefineWorkHoursSundayLunch] = useState("");
 
+  // const [startWorkHour, setStartWorkHour] = useState("08:00");
+  // const [endWorkHour, setEndWorkHour] = useState("17:30");
+  // const [startWorkHourWeekend, setStartWorkHourWeekend] = useState("08:00");
+  // const [endWorkHourWeekend, setEndWorkHourWeekend] = useState("17:30");
   const [seg, setSeg] = useState(true);
   const [ter, setTer] = useState(true);
   const [quar, setQuar] = useState(true);
@@ -212,8 +222,14 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
         setStartDefineWorkHoursSundayLunch(data.StartDefineWorkHoursSundayLunch);
         setEndDefineWorkHoursSundayLunch(data.EndDefineWorkHoursSundayLunch);
 
+
+
         SetDefineWorkHours(data.defineWorkHours);
         setOutOfWorkMessage(data.outOfWorkMessage);
+        // setStartWorkHour(data.startWorkHour);
+        // setEndWorkHour(data.endWorkHour);
+        // setStartWorkHourWeekend(data.startWorkHourWeekend);
+        // setEndWorkHourWeekend(data.endWorkHourWeekend);
 
         const whatsQueueIds = data.queues?.map(queue => queue.id);
         setSelectedQueueIds(whatsQueueIds);
@@ -225,7 +241,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
   }, [whatsAppId]);
 
 
-  
+
 
   const handleChange = (e) => {
     if (e.target.value === "MON") {
@@ -257,7 +273,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 
   const handleSaveWhatsApp = async values => {
     const whatsappData = {
-      ...values, queueIds: selectedQueueIds, 
+      ...values, queueIds: selectedQueueIds,
 
       StartDefineWorkHoursMonday: StartDefineWorkHoursMonday,
       EndDefineWorkHoursMonday: EndDefineWorkHoursMonday,
@@ -321,6 +337,43 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
   const handleClose = () => {
     onClose();
     setWhatsApp(initialState);
+
+    setStartDefineWorkHoursMonday();
+    setEndDefineWorkHoursMonday();
+    setStartDefineWorkHoursMondayLunch();
+    setEndDefineWorkHoursMondayLunch();
+
+    setStartDefineWorkHoursTuesday();
+    setEndDefineWorkHoursTuesday();
+    setStartDefineWorkHoursTuesdayLunch();
+    setEndDefineWorkHoursTuesdayLunch();
+
+    setStartDefineWorkHoursWednesday();
+    setEndDefineWorkHoursWednesday();
+    setStartDefineWorkHoursWednesdayLunch();
+    setEndDefineWorkHoursWednesdayLunch();
+
+    setStartDefineWorkHoursThursday();
+    setEndDefineWorkHoursThursday();
+    setStartDefineWorkHoursThursdayLunch();
+    setEndDefineWorkHoursThursdayLunch();
+
+    setStartDefineWorkHoursFriday();
+    setEndDefineWorkHoursFriday();
+    setStartDefineWorkHoursFridayLunch();
+    setEndDefineWorkHoursFridayLunch();
+
+    setStartDefineWorkHoursSaturday();
+    setEndDefineWorkHoursSaturday();
+    setStartDefineWorkHoursSaturdayLunch();
+    setEndDefineWorkHoursSaturdayLunch();
+
+    setStartDefineWorkHoursSunday();
+    setEndDefineWorkHoursSunday();
+    setStartDefineWorkHoursSundayLunch();
+    setEndDefineWorkHoursSundayLunch();
+
+    // SetDefineWorkHours();
   };
 
   return (
@@ -385,7 +438,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     }
                     label={i18n.t("whatsappModal.form.display")}
                   />
-                   <FormControlLabel
+                  <FormControlLabel
                     control={
                       <Field
                         as={Switch}
@@ -435,7 +488,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                     margin="dense"
                   />
                 </div>
-                {/* <div>
+                <div>
 									<Field
 										as={TextField}
 										label={i18n.t("whatsappModal.form.ratingMessage")}
@@ -451,13 +504,80 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 										variant="outlined"
 										margin="dense"
 									/>
-								</div> */}
-
+								</div> 
+                <div>
+                  <FormControlLabel
+                    control={
+                      <Field
+                        as={Switch}
+                        color="primary"
+                        name="sendInactiveMessage"
+                        checked={values.sendInactiveMessage}
+                      />
+                    }
+                      label={i18n.t("whatsappModal.form.sendInactiveMessage")}
+                   />
+                </div>
+                
+                <div>
+                  <Field
+                    as={TextField}
+                    label={i18n.t("whatsappModal.form.inactiveMessage")}
+                    type="inactiveMessage"
+                    multiline
+                    rows={4}
+                    fullWidth
+                    name="inactiveMessage"
+                    error={
+                      touched.inactiveMessage && Boolean(errors.inactiveMessage)
+                    }
+                    helperText={
+                      touched.inactiveMessage && errors.inactiveMessage
+                    }
+                    variant="outlined"
+                    margin="dense"
+                  />
+                </div>
+                <Grid xs={12} md={12} item>
+                    <FormControl
+                      variant="outlined"
+                      margin="dense"
+                      fullWidth
+                      className={classes.formControl}
+                    >
+                      <InputLabel id="timeInactiveMessage-selection-label">
+                        {i18n.t("whatsappModal.form.timeInactiveMessage")}
+                      </InputLabel>
+                      <Field
+                        as={Select}
+                        label={i18n.t("whatsappModal.form.timeInactiveMessage")}
+                        placeholder={i18n.t(
+                          "whatsappModal.form.timeInactiveMessage"
+                        )}
+                        labelId="timeInactiveMessage-selection-label"
+                        id="timeInactiveMessage"
+                        name="timeInactiveMessage"
+                      >
+                        <MenuItem value={"0"}>Desabilitado</MenuItem>
+                        <MenuItem value={"0.25"}>15 minutos</MenuItem>
+                        <MenuItem value={"1"}>1 hora</MenuItem>
+                        <MenuItem value={"4"}>4 horas</MenuItem>
+                        <MenuItem value={"8"}>8 horas</MenuItem>
+                        <MenuItem value={"12"}>12 horas</MenuItem>
+                        <MenuItem value={"24"}>24 horas</MenuItem>
+                        <MenuItem value={"36"}>36 horas</MenuItem>
+                        <MenuItem value={"96"}>4 dias</MenuItem>
+                        <MenuItem value={"168"}>7 dias</MenuItem>
+                      </Field>
+                    </FormControl>
+                  </Grid>
 
                 <div>
                   {/* Expediente */}
 
                   {defineWorkHours === true ? (
+
+
                     <div
                     // className={classes.textoExpediente}
                     >
@@ -481,6 +601,7 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
 
                         onChange={(e) => setOutOfWorkMessage(e.target.value)}
                       />
+
                     </div>
                   ) : (
                     ""
@@ -503,11 +624,27 @@ const WhatsAppModal = ({ open, onClose, whatsAppId }) => {
                           }}
                         >
                           <Tooltip title={i18n.t("whatsappModal.form.longText")} placement="top">
-                            <FormControlLabel
+                            {/* <FormControlLabel
                               value="defineWorkHours"
                               control={
                                 <Checkbox
                                   size="small"
+                                  checked={defineWorkHours}
+                                  onChange={handleChange}
+                                />
+                              }
+                              label="Definir horário de expediente"
+                              labelPlacement="end"
+
+                            /> */}
+
+                            <FormControlLabel
+                              control={
+                                <Field
+                                  as={Switch}
+                                  value="defineWorkHours"
+                                  name="outOfWorkMessage"
+                                  color="primary"
                                   checked={defineWorkHours}
                                   onChange={handleChange}
                                 />

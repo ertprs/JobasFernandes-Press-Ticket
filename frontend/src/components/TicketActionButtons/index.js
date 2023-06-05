@@ -34,7 +34,7 @@ const TicketActionButtons = ({ ticket }) => {
 	const classes = useStyles();
 	const history = useHistory();
 	const [anchorEl, setAnchorEl] = useState(null);
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState("false");
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
 
@@ -46,22 +46,25 @@ const TicketActionButtons = ({ ticket }) => {
 		setAnchorEl(null);
 	};
 
-	const handleUpdateTicketStatus = async (e, status, userId) => {
-		setLoading(true);
+	const handleUpdateTicketStatus = async (e, status, userId, isFinished) => {
+		setLoading("true");
 		try {
 			await api.put(`/tickets/${ticket.id}`, {
 				status: status,
 				userId: userId || null,
+				isFinished: isFinished,
+				ticketData: ticket
+
 			});
 
-			setLoading(false);
+			setLoading("false");
 			if (status === "open") {
 				history.push(`/tickets/${ticket.id}`);
 			} else {
 				history.push("/tickets");
 			}
 		} catch (err) {
-			setLoading(false);
+			setLoading("false");
 			toastError(err);
 		}
 	};
@@ -79,7 +82,7 @@ const TicketActionButtons = ({ ticket }) => {
 						}}
 						className={classes.bottomButton}
 						color="primary"
-						onClick={e => handleUpdateTicketStatus(e, "open", user?.id)} />
+						onClick={e => handleUpdateTicketStatus(e, "open", user?.id,false)} />
 				</Tooltip>
 			)}
 			{ticket.status === "open" && (
@@ -94,7 +97,7 @@ const TicketActionButtons = ({ ticket }) => {
 							}}
 							className={classes.bottomButton}
 							color="primary"
-							onClick={e => handleUpdateTicketStatus(e, "pending", null)} />
+							onClick={e => handleUpdateTicketStatus(e, "pending", null, false)} />
 					</Tooltip>
 					<Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
 						<CancelIcon
@@ -105,7 +108,7 @@ const TicketActionButtons = ({ ticket }) => {
 							}}
 							className={classes.bottomButton}
 							color="primary"
-							onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)} />
+							onClick={e => handleUpdateTicketStatus(e, "closed", user?.id, false)} />
 					</Tooltip>
 					<Tooltip title={i18n.t("messagesList.header.buttons.more")}>
 						<MoreVert

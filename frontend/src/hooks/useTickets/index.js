@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { getHoursCloseTicketsAuto } from "../../config";
+// import { getHoursCloseTicketsAuto } from "../../config";
 import toastError from "../../errors/toastError";
 
 import api from "../../services/api";
@@ -11,6 +11,7 @@ const useTickets = ({
     date,
     showAll,
     queueIds,
+    userId,
     withUnreadMessages,
 }) => {
     const [loading, setLoading] = useState(true);
@@ -31,27 +32,28 @@ const useTickets = ({
                             date,
                             showAll,
                             queueIds,
+                            userId,
                             withUnreadMessages,
                         },
                     })
                     setTickets(data.tickets)
 
-                    let horasFecharAutomaticamente = getHoursCloseTicketsAuto(); 
+                    // let horasFecharAutomaticamente = getHoursCloseTicketsAuto(); 
 
-                    if (status === "open" && horasFecharAutomaticamente && horasFecharAutomaticamente !== "" &&
-                        horasFecharAutomaticamente !== "0" && Number(horasFecharAutomaticamente) > 0) {
+                    // if (status === "open" && horasFecharAutomaticamente && horasFecharAutomaticamente !== "" &&
+                    //     horasFecharAutomaticamente !== "0" && Number(horasFecharAutomaticamente) > 0) {
 
-                        let dataLimite = new Date()
-                        dataLimite.setHours(dataLimite.getHours() - Number(horasFecharAutomaticamente))
+                    //     let dataLimite = new Date()
+                    //     dataLimite.setHours(dataLimite.getHours() - Number(horasFecharAutomaticamente))
 
-                        data.tickets.forEach(ticket => {
-                            if (ticket.status !== "closed") {
-                                let dataUltimaInteracaoChamado = new Date(ticket.updatedAt)
-                                if (dataUltimaInteracaoChamado < dataLimite)
-                                    closeTicket(ticket)
-                            }
-                        })
-                    }
+                    //     data.tickets.forEach(ticket => {
+                    //         if (ticket.status !== "closed") {
+                    //             let dataUltimaInteracaoChamado = new Date(ticket.updatedAt)
+                    //             if (dataUltimaInteracaoChamado < dataLimite)
+                    //                 closeTicket(ticket)
+                    //         }
+                    //     })
+                    // }
 
                     setHasMore(data.hasMore)
                     setCount(data.count)
@@ -79,6 +81,7 @@ const useTickets = ({
         date,
         showAll,
         queueIds,
+        userId,
         withUnreadMessages,
     ])
 

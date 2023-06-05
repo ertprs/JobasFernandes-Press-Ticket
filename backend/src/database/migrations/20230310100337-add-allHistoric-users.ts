@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.addColumn("Users", "allHistoric", {
       type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: "desabled"
+      defaultValue: "enabled"
     });
   },
 
