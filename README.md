@@ -36,7 +36,7 @@ Um sistema de tickets muito simples baseado em mensagens do WhatsApp, que permit
 ## Demo:
 
 ```bash
-https://demo.valezap.app/login
+https://demo.pnztech.com.br/login
 ```  
 
 * User: 
