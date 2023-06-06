@@ -113,6 +113,14 @@ const Connections = () => {
 		confirmationModalInitialState
 	);
 
+	const restartpm2 = async () => {
+		try {
+			await api.post('/restartpm2');
+		} catch (err) {
+			toastError(err);
+		}
+	}
+
 	const handleStartWhatsAppSession = async whatsAppId => {
 		try {
 			await api.post(`/whatsappsession/${whatsAppId}`);
@@ -314,6 +322,13 @@ const Connections = () => {
 			<MainHeader>
 				<Title>{i18n.t("connections.title")} ({whatsApps.length})</Title>
 				<MainHeaderButtonsWrapper>
+					<Button
+						variant="contained"
+						color="primary"
+						onClick={restartpm2}
+					>
+						{i18n.t("REINICIAR TODAS CONEXÕES")}
+					</Button>
 					<Tooltip title={i18n.t("connections.buttons.add")}>
 						<Button
 							variant="contained"
