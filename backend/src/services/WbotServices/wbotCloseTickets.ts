@@ -113,9 +113,8 @@ export const ClosedAllOpenTickets = async (): Promise<void> => {
 
             if (sendIsInactive && ticket.status === "open" && messageInactive) {
               const body = formatBody(`\u200e${messageInactive}`, ticketBody);
-              if (messageInactive.trim() !== ' ') {
-                await SendWhatsAppMessage({ body: body, ticket: ticketBody });
-              }
+              await SendWhatsAppMessage({ body: body, ticket: ticketBody });
+
             }
 
             closeTicket(ticket, useNPS, ticket.status);
